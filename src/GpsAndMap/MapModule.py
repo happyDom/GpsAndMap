@@ -35,7 +35,7 @@ except ImportError as imErr:
             raise exp1
 
 try:
-    from GpsModule import *
+    from GpsAndMap.GpsModule import *
 except ImportError as imErr:
     print('尝试导入 GpsModule 模块遇到异常:', imErr)
     raise imErr
