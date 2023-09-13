@@ -35,10 +35,15 @@ except ImportError as imErr:
             raise exp1
 
 try:
-    from GpsAndMap.GpsModule import *
-except ImportError as imErr:
-    print('尝试导入 GpsModule 模块遇到异常:', imErr)
-    raise imErr
+    from GpsModule import GPS坐标类 as _GPS坐标类
+    from GpsModule import _GPS坐标系类型 as _GPS坐标系类型
+except ImportError:
+    try:
+        from GpsAndMap.GpsModule import GPS坐标类 as _GPS坐标类
+        from GpsModule import _GPS坐标系类型 as _GPS坐标系类型
+    except ImportError as imErr:
+        print('尝试导入 GpsModule 模块遇到异常:', imErr)
+        raise imErr
 
 try:
     from DebugInfo.DebugInfo import 打印模板 as _打印模板
@@ -96,27 +101,27 @@ class 热力点类:
     """
 
     def __init__(self,
-                 位置: GPS坐标类 = None,
+                 位置: _GPS坐标类 = None,
                  权值: float = None):
-        self.__位置: GPS坐标类 = 位置
+        self.__位置: _GPS坐标类 = 位置
         self.权值: float = 权值
 
     # region 访问器
     @property
     def 有效(self) -> bool:
-        return isinstance(self.__位置, GPS坐标类) and self.__位置.有效
+        return isinstance(self.__位置, _GPS坐标类) and self.__位置.有效
 
     @property
     def 无效(self) -> bool:
         return not self.有效
 
     @property
-    def 位置(self) -> GPS坐标类:
-        return self.__位置 if isinstance(self.__位置, GPS坐标类) else GPS坐标类()
+    def 位置(self) -> _GPS坐标类:
+        return self.__位置 if isinstance(self.__位置, _GPS坐标类) else _GPS坐标类()
 
     @位置.setter
-    def 位置(self, 坐标: GPS坐标类):
-        self.__位置 = 坐标 if isinstance(坐标, GPS坐标类) else None
+    def 位置(self, 坐标: _GPS坐标类):
+        self.__位置 = 坐标 if isinstance(坐标, _GPS坐标类) else None
 
     @property
     def 副本(self) -> '热力点类':
@@ -152,9 +157,9 @@ class _线段中点类:
     """
 
     def __init__(self,
-                 位置: GPS坐标类 = GPS坐标类(),
+                 位置: _GPS坐标类 = _GPS坐标类(),
                  倾角: int or float = 0.0):
-        self.位置: GPS坐标类 = 位置
+        self.位置: _GPS坐标类 = 位置
         self.倾角: int or float = 倾角
 
 
@@ -342,10 +347,10 @@ class 消息样式类:
     @property
     def _popup对象(self) -> _folium.Popup:
         return None if self.无效 else _folium.Popup(html=self.消息,
-                                                  parse_html=self.渲染html,
-                                                  max_width=self.最大宽度有效值,
-                                                  show=self.默认显示,
-                                                  sticky=self.粘性)
+                                                    parse_html=self.渲染html,
+                                                    max_width=self.最大宽度有效值,
+                                                    show=self.默认显示,
+                                                    sticky=self.粘性)
 
     @property
     def 有效(self) -> bool:
@@ -621,7 +626,8 @@ class 线上文本样式类:
 
     @property
     def 副本(self) -> '线上文本样式类':
-        return 线上文本样式类(self.文本, self.文本颜色, self.文本尺寸px, self.重复, self.居中, self.显示于路径下方, self.偏移量px, self.旋转deg, _copy(self.__文本属性字典))
+        return 线上文本样式类(self.文本, self.文本颜色, self.文本尺寸px, self.重复, self.居中, self.显示于路径下方, self.偏移量px, self.旋转deg,
+                              _copy(self.__文本属性字典))
 
     # endregion
 
@@ -781,7 +787,7 @@ class 图标标记类:
     """
 
     def __init__(self,
-                 位置: GPS坐标类 = GPS坐标类(),
+                 位置: _GPS坐标类 = _GPS坐标类(),
                  消息: 消息样式类 = 消息样式类(),
                  图标: 图标样式类 = 图标样式类(),
                  提示: 提示样式类 = 提示样式类()):
@@ -791,7 +797,7 @@ class 图标标记类:
         :param 消息: popup消息
         :param 图标: 图标样式
         """
-        self.位置: GPS坐标类 = 位置
+        self.位置: _GPS坐标类 = 位置
         self.消息: 消息样式类 = 消息
         self.图标: 图标样式类 = 图标
         self.提示: 提示样式类 = 提示
@@ -811,10 +817,10 @@ class 图标标记类:
 
     # endregion
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         """
         :param 图层: folium.Map or folium.FeatureGroup; 用于收集 folium 对象的图层 或者 地图
-        :param 目标坐标系: GPS坐标系类型; 目标图层的坐标系类型
+        :param 目标坐标系: _GPS坐标系类型; 目标图层的坐标系类型
         :return: None
         """
         if self.有效:
@@ -848,7 +854,8 @@ class 图标标记类:
             画板.添加一行('方法', '说明')
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
-        画板.添加一行('_添加到图层:', '根据图标标记类数据结构的定义, 生成一个 folium.Marker 对象,并将该 folium.Marker 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('_添加到图层:',
+                      '根据图标标记类数据结构的定义, 生成一个 folium.Marker 对象,并将该 folium.Marker 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 folium.Marker 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 folium.Marker 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -863,13 +870,13 @@ class 圆圈标记类:
     """
 
     def __init__(self,
-                 位置: GPS坐标类 = GPS坐标类(),
+                 位置: _GPS坐标类 = _GPS坐标类(),
                  半径m: int = 0,
                  半径px: int = 0,
                  消息: 消息样式类 = 消息样式类(),
                  圆圈: 封闭图形样式类 = 封闭图形样式类(),
                  提示: 提示样式类 = 提示样式类()):
-        self.位置: GPS坐标类 = 位置
+        self.位置: _GPS坐标类 = 位置
         self.半径m: int = 半径m
         self.半径px: int = 半径px
         self.消息: 消息样式类 = 消息
@@ -879,7 +886,7 @@ class 圆圈标记类:
     # region 访问器
     @property
     def 有效(self) -> bool:
-        if isinstance(self.位置, GPS坐标类) and self.位置.有效:
+        if isinstance(self.位置, _GPS坐标类) and self.位置.有效:
             if isinstance(self.半径m, int) and self.半径m > 0:
                 return True
             elif isinstance(self.半径px, int) and self.半径px > 0:
@@ -896,10 +903,10 @@ class 圆圈标记类:
 
     # endregion
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         """
         :param 图层: folium.Map or folium.FeatureGroup; 用于收集 folium 对象的图层 或者 地图
-        :param 目标坐标系: GPS坐标系类型; 目标图层的坐标系类型
+        :param 目标坐标系: _GPS坐标系类型; 目标图层的坐标系类型
         :return: None
         """
         if self.有效:
@@ -967,7 +974,8 @@ class 圆圈标记类:
             画板.添加一行('方法', '说明')
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
-        画板.添加一行('_添加到图层:', '根据图标标记类数据结构的定义, 生成一个 folium.Circle/CircleMarker 对象,并将该 folium.Circle/CircleMarker 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('_添加到图层:',
+                      '根据图标标记类数据结构的定义, 生成一个 folium.Circle/CircleMarker 对象,并将该 folium.Circle/CircleMarker 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 folium.Circle/CircleMarker 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 folium.Circle/CircleMarker 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -982,14 +990,14 @@ class 正多边形标记类:
     """
 
     def __init__(self,
-                 位置: GPS坐标类 or 图标标记类 = None,
+                 位置: _GPS坐标类 or 图标标记类 = None,
                  边数: int = 0,
                  半径px: int = 0,
                  角度deg: int or float = 0.0,
                  图形: 封闭图形样式类 = 封闭图形样式类(),
                  消息: 消息样式类 = 消息样式类(),
                  提示: 提示样式类 = 提示样式类()):
-        self.位置: GPS坐标类 or 图标标记类 = 位置 if 位置 is not None else GPS坐标类()
+        self.位置: _GPS坐标类 or 图标标记类 = 位置 if 位置 is not None else _GPS坐标类()
         self.边数: int = 边数
         self.半径px: int = 半径px
         self.角度deg: int or float = 角度deg
@@ -1012,10 +1020,10 @@ class 正多边形标记类:
 
     # endregion
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         """
         :param 图层: folium.Map or folium.FeatureGroup; 用于收集 folium 对象的图层 或者 地图
-        :param 目标坐标系: GPS坐标系类型; 目标图层的坐标系类型
+        :param 目标坐标系: _GPS坐标系类型; 目标图层的坐标系类型
         :return: None
         """
         if self.有效:
@@ -1033,7 +1041,7 @@ class 正多边形标记类:
                     if self.图形.填充透明度 < 0:
                         self.图形.填充透明度 = 0.5
 
-                位置: GPS坐标类 = self.位置.位置 if isinstance(self.位置, 图标标记类) else self.位置
+                位置: _GPS坐标类 = self.位置.位置 if isinstance(self.位置, 图标标记类) else self.位置
                 _folium.RegularPolygonMarker(location=位置.目标坐标(目标坐标系=目标坐标系)[::-1],
                                              number_of_sides=self.边数,
                                              rotation=self.角度deg,
@@ -1076,7 +1084,8 @@ class 正多边形标记类:
             画板.添加一行('方法', '说明')
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
-        画板.添加一行('_添加到图层:', '根据图标标记类数据结构的定义, 生成一个 folium.RegularPolygonMarker 对象,并将该 folium.RegularPolygonMarker 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('_添加到图层:',
+                      '根据图标标记类数据结构的定义, 生成一个 folium.RegularPolygonMarker 对象,并将该 folium.RegularPolygonMarker 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 folium.RegularPolygonMarker 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 folium.RegularPolygonMarker 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -1092,7 +1101,7 @@ class 蚂蚁路径标记类:
     """
 
     def __init__(self,
-                 路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
+                 路径点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  显示: bool = False,
                  暂停动画: bool = False,
                  反转动画: bool = False,
@@ -1104,7 +1113,7 @@ class 蚂蚁路径标记类:
                  消息: 消息样式类 = 消息样式类(),
                  提示: 提示样式类 = 提示样式类(),
                  ):
-        self.路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = [] if 路径点序列 is None else 路径点序列
+        self.路径点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = [] if 路径点序列 is None else 路径点序列
         self.显示: bool = 显示
         self.透明度: float = 透明度
         self.__暂停动画: bool = 暂停动画
@@ -1113,7 +1122,7 @@ class 蚂蚁路径标记类:
         self.__硬件加速: bool = 硬件加速
         self.__间断色: list[str or 颜色名] = 间断色
         self.__间断长度px: list[int] = 间断长度px
-        self.__GPS坐标系推理基准: GPS坐标系类型 = GPS坐标系类型.wgs84
+        self.__GPS坐标系推理基准: _GPS坐标系类型 = _GPS坐标系类型.wgs84
         self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
         self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
 
@@ -1183,42 +1192,42 @@ class 蚂蚁路径标记类:
     @property
     def 副本(self) -> '蚂蚁路径标记类':
         return 蚂蚁路径标记类(_deepcopy(self.路径点序列),
-                       self.显示,
-                       self.__暂停动画,
-                       self.__反转动画,
-                       self.__动画周期ms,
-                       self.__硬件加速,
-                       _copy(self.__间断色),
-                       self.透明度,
-                       _copy(self.__间断长度px),
-                       self.消息.副本,
-                       self.提示.副本)
+                              self.显示,
+                              self.__暂停动画,
+                              self.__反转动画,
+                              self.__动画周期ms,
+                              self.__硬件加速,
+                              _copy(self.__间断色),
+                              self.透明度,
+                              _copy(self.__间断长度px),
+                              self.消息.副本,
+                              self.提示.副本)
 
-    def 添加路径点(self, 路径点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '蚂蚁路径标记类':
+    def 添加路径点(self, 路径点: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '蚂蚁路径标记类':
         """
         将指定的坐标点添加到该蚂蚁路径类对象的路径点序列中来
         :param 路径点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
         :return: self
         """
-        if type(路径点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 路径点 if isinstance(路径点, GPS坐标类) else 路径点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+        if type(路径点) in [_GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+            位置 = 路径点 if isinstance(路径点, _GPS坐标类) else 路径点.位置
+            if 位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                 位置.坐标系 = self.__GPS坐标系推理基准
             else:
                 self.__GPS坐标系推理基准 = 位置.坐标系
             self.路径点序列.append(路径点)
         return self
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         if self.有效:
             if type(图层) in [_folium.Map, _folium.FeatureGroup]:
-                if 目标坐标系 is None or 目标坐标系 == GPS坐标系类型.智能推理坐标:
+                if 目标坐标系 is None or 目标坐标系 == _GPS坐标系类型.智能推理坐标:
                     目标坐标系 = self.__GPS坐标系推理基准
 
                 # 生成路径点序列
                 纬经度坐标序列: list[list[float, float]] = []
                 for 路径点 in self.路径点序列:
-                    if isinstance(路径点, GPS坐标类) and 路径点.有效:
+                    if isinstance(路径点, _GPS坐标类) and 路径点.有效:
                         纬经度坐标序列.append(list(路径点.目标坐标(目标坐标系=目标坐标系))[::-1])
                     elif type(路径点) in [图标标记类, 圆圈标记类, 正多边形标记类] and 路径点.位置.有效:
                         纬经度坐标序列.append(list(路径点.位置.目标坐标(目标坐标系=目标坐标系))[::-1])
@@ -1263,8 +1272,8 @@ class 蚂蚁路径标记类:
             画板.添加一行('属性', '说明')
         else:
             画板.添加一行('属性', '说明').修饰行(_青字)
-        画板.添加一行('路径点序列:', '以包括有位置[GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义蚂蚁路径的各路径点位置')
-        画板.添加一行('', '可作为路径点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('路径点序列:', '以包括有位置[_GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义蚂蚁路径的各路径点位置')
+        画板.添加一行('', '可作为路径点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
         画板.添加一行('显示:', '定义是否显示蚂蚁路径,可以在折线或者多边形对象中使用该属性,以共享折线或者多边形对象的路径点,生成蚂蚁路径')
         画板.添加一行('暂停动画:', '读取或者设置蚂蚁路径的 pause 属性')
         画板.添加一行('反转动画:', '读取或者设置蚂蚁路径的 reverse 属性')
@@ -1284,8 +1293,9 @@ class 蚂蚁路径标记类:
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
         画板.添加一行('添加路径点:', '将指定的坐标点对象添加到蚂蚁路径的路径点列表中')
-        画板.添加一行('**路径点', '可被添加为路径点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
-        画板.添加一行('_添加到图层:', '根据蚂蚁路径类数据结构的定义, 生成一个 plugins.AntPath 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('**路径点', '可被添加为路径点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('_添加到图层:',
+                      '根据蚂蚁路径类数据结构的定义, 生成一个 plugins.AntPath 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 plugins.AntPath 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 plugins.AntPath 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -1300,15 +1310,15 @@ class 矩形标记类:
     """
 
     def __init__(self,
-                 对角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
+                 对角点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  图形: 封闭图形样式类 = 封闭图形样式类(),
                  消息: 消息样式类 = 消息样式类(),
                  提示: 提示样式类 = 提示样式类()):
-        self.对角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 对角点序列 if isinstance(对角点序列, list) else []
+        self.对角点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 对角点序列 if isinstance(对角点序列, list) else []
         self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
         self.图形: 封闭图形样式类 = 图形 if isinstance(图形, 封闭图形样式类) else 封闭图形样式类()
         self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
-        self.__GPS坐标系推理基准: GPS坐标系类型 = GPS坐标系类型.wgs84
+        self.__GPS坐标系推理基准: _GPS坐标系类型 = _GPS坐标系类型.wgs84
 
     # region 访问器
     @property
@@ -1322,40 +1332,40 @@ class 矩形标记类:
     @property
     def 副本(self) -> '矩形标记类':
         return 矩形标记类(_deepcopy(self.对角点序列),
-                     self.图形.副本,
-                     self.消息.副本,
-                     self.提示.副本)
+                          self.图形.副本,
+                          self.消息.副本,
+                          self.提示.副本)
 
-    def 添加角点(self, 角点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '矩形标记类':
+    def 添加角点(self, 角点: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '矩形标记类':
         """
         将指定的角点对象添加到该多矩形标记类对象的对角点序列中来
         :param 角点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
         :return: self
         """
-        if type(角点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 角点 if isinstance(角点, GPS坐标类) else 角点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+        if type(角点) in [_GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+            位置 = 角点 if isinstance(角点, _GPS坐标类) else 角点.位置
+            if 位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                 位置.坐标系 = self.__GPS坐标系推理基准
             else:
                 self.__GPS坐标系推理基准 = 位置.坐标系
             self.对角点序列.append(角点)
         return self
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         """
         :param 图层: folium.Map or folium.FeatureGroup; 用于收集 folium 对象的图层 或者 地图
-        :param 目标坐标系: GPS坐标系类型; 目标图层的坐标系类型
+        :param 目标坐标系: _GPS坐标系类型; 目标图层的坐标系类型
         :return: None
         """
         if self.有效:
             if type(图层) in [_folium.Map, _folium.FeatureGroup]:
-                if 目标坐标系 is None or 目标坐标系 == GPS坐标系类型.智能推理坐标:
+                if 目标坐标系 is None or 目标坐标系 == _GPS坐标系类型.智能推理坐标:
                     目标坐标系 = self.__GPS坐标系推理基准
 
                 # 生成路径点序列
                 纬经度坐标序列: list[list[float, float]] = []
                 for 路径点 in self.对角点序列:
-                    if isinstance(路径点, GPS坐标类) and 路径点.有效:
+                    if isinstance(路径点, _GPS坐标类) and 路径点.有效:
                         纬经度坐标序列.append(list(路径点.目标坐标(目标坐标系=目标坐标系))[::-1])
                     elif type(路径点) in [图标标记类, 圆圈标记类, 正多边形标记类] and 路径点.位置.有效:
                         纬经度坐标序列.append(list(路径点.位置.目标坐标(目标坐标系=目标坐标系))[::-1])
@@ -1398,8 +1408,8 @@ class 矩形标记类:
             画板.添加一行('属性', '说明')
         else:
             画板.添加一行('属性', '说明').修饰行(_青字)
-        画板.添加一行('对角点序列:', '以包括有位置[GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义矩形的对角线位置')
-        画板.添加一行('', '可作为角点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('对角点序列:', '以包括有位置[_GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义矩形的对角线位置')
+        画板.添加一行('', '可作为角点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
         画板.添加一行('图形:', '封闭图形样式类, 定义了矩形标记的边框/线条样式以及内部区域的填充样式')
         画板.添加一行('消息:', '消息样式类对象,用于定义矩形标记需要显示的消息样式信息')
         画板.添加一行('提示:', '提示样式类对象,用于定义矩形标记需要显示的提示样式信息')
@@ -1413,8 +1423,9 @@ class 矩形标记类:
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
         画板.添加一行('添加角点:', '将指定的坐标点对象添加到矩形标记的对角点列表中')
-        画板.添加一行('**角点', '可被添加为角点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
-        画板.添加一行('_添加到图层:', '根据矩形标记类数据结构的定义, 生成一个 folium.Rectangle 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('**角点', '可被添加为角点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('_添加到图层:',
+                      '根据矩形标记类数据结构的定义, 生成一个 folium.Rectangle 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 folium.Rectangle 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 folium.Rectangle 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -1429,17 +1440,17 @@ class 多边形标记类:
     """
 
     def __init__(self,
-                 路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
+                 路径点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  图形: 封闭图形样式类 = 封闭图形样式类(),
                  消息: 消息样式类 = 消息样式类(),
                  提示: 提示样式类 = 提示样式类(),
                  蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径标记类()):
-        self.路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 路径点序列 if isinstance(路径点序列, list) else []
+        self.路径点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 路径点序列 if isinstance(路径点序列, list) else []
         self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
         self.图形: 封闭图形样式类 = 图形 if isinstance(图形, 封闭图形样式类) else 封闭图形样式类()
         self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
         self.蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径 if isinstance(蚂蚁路径, 蚂蚁路径标记类) else 蚂蚁路径标记类()
-        self.__GPS坐标系推理基准: GPS坐标系类型 = GPS坐标系类型.wgs84
+        self.__GPS坐标系推理基准: _GPS坐标系类型 = _GPS坐标系类型.wgs84
 
     # region 访问器
     @property
@@ -1453,41 +1464,41 @@ class 多边形标记类:
     @property
     def 副本(self) -> '多边形标记类':
         return 多边形标记类(_deepcopy(self.路径点序列),
-                      self.图形.副本,
-                      self.消息.副本,
-                      self.提示.副本,
-                      self.蚂蚁路径.副本)
+                            self.图形.副本,
+                            self.消息.副本,
+                            self.提示.副本,
+                            self.蚂蚁路径.副本)
 
-    def 添加角点(self, 角点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '多边形标记类':
+    def 添加角点(self, 角点: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '多边形标记类':
         """
         将指定的角点对象添加到该多边形标记类对象的角点序列中来
         :param 角点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
         :return: self
         """
-        if type(角点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 角点 if isinstance(角点, GPS坐标类) else 角点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+        if type(角点) in [_GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+            位置 = 角点 if isinstance(角点, _GPS坐标类) else 角点.位置
+            if 位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                 位置.坐标系 = self.__GPS坐标系推理基准
             else:
                 self.__GPS坐标系推理基准 = 位置.坐标系
             self.路径点序列.append(角点)
         return self
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         """
         :param 图层: folium.Map or folium.FeatureGroup; 用于收集 folium 对象的图层 或者 地图
-        :param 目标坐标系: GPS坐标系类型; 目标图层的坐标系类型
+        :param 目标坐标系: _GPS坐标系类型; 目标图层的坐标系类型
         :return: None
         """
         if self.有效:
             if type(图层) in [_folium.Map, _folium.FeatureGroup]:
-                if 目标坐标系 is None or 目标坐标系 == GPS坐标系类型.智能推理坐标:
+                if 目标坐标系 is None or 目标坐标系 == _GPS坐标系类型.智能推理坐标:
                     目标坐标系 = self.__GPS坐标系推理基准
 
                 # 生成路径点序列
                 纬经度坐标序列: list[list[float, float]] = []
                 for 路径点 in self.路径点序列:
-                    if isinstance(路径点, GPS坐标类) and 路径点.有效:
+                    if isinstance(路径点, _GPS坐标类) and 路径点.有效:
                         纬经度坐标序列.append(list(路径点.目标坐标(目标坐标系=目标坐标系))[::-1])
                     elif type(路径点) in [图标标记类, 圆圈标记类, 正多边形标记类] and 路径点.位置.有效:
                         纬经度坐标序列.append(list(路径点.位置.目标坐标(目标坐标系=目标坐标系))[::-1])
@@ -1536,8 +1547,8 @@ class 多边形标记类:
             画板.添加一行('属性', '说明')
         else:
             画板.添加一行('属性', '说明').修饰行(_青字)
-        画板.添加一行('点序列:', '以包括有位置[GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义多边形标记的一系列角点位置')
-        画板.添加一行('', '可作为角点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('点序列:', '以包括有位置[_GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义多边形标记的一系列角点位置')
+        画板.添加一行('', '可作为角点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
         画板.添加一行('图形:', '封闭图形样式类, 定义了多边形标记的边框/线条样式以及内部区域的填充样式')
         画板.添加一行('消息:', '消息样式类对象,用于定义多边形标记需要显示的消息样式信息')
         画板.添加一行('提示:', '提示样式类对象,用于定义多边形标记需要显示的提示样式信息')
@@ -1552,8 +1563,9 @@ class 多边形标记类:
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
         画板.添加一行('添加角点:', '将指定的坐标点对象添加到多边形的角点列表中')
-        画板.添加一行('**角点', '可被添加为角点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
-        画板.添加一行('_添加到图层:', '根据多边形标记类数据结构的定义, 生成一个 folium.Polygon 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('**角点', '可被添加为角点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('_添加到图层:',
+                      '根据多边形标记类数据结构的定义, 生成一个 folium.Polygon 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 folium.Polygon 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 folium.Polygon 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -1568,26 +1580,26 @@ class 折线类:
     """
 
     def __init__(self,
-                 点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
+                 点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  显示转移方向: bool = False,
                  消息: 消息样式类 = 消息样式类(),
                  线条样式: 线条样式类 = 线条样式类(),
                  提示: 提示样式类 = 提示样式类(),
                  线上文本样式: 线上文本样式类 = 线上文本样式类(),
                  蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径标记类()):
-        self.路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 点序列 if isinstance(点序列, list) else []
+        self.路径点序列: list[_GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 点序列 if isinstance(点序列, list) else []
         self.显示转移方向: bool = 显示转移方向
         self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
         self.线条样式: 线条样式类 = 线条样式 if isinstance(线条样式, 线条样式类) else 线条样式类()
         self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
         self.线上文本样式: 线上文本样式类 = 线上文本样式 if isinstance(线上文本样式, 线上文本样式类) else 线上文本样式类()
         self.蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径 if isinstance(蚂蚁路径, 蚂蚁路径标记类) else 蚂蚁路径标记类()
-        self.__GPS坐标系推理基准: GPS坐标系类型 = GPS坐标系类型.wgs84
+        self.__GPS坐标系推理基准: _GPS坐标系类型 = _GPS坐标系类型.wgs84
         if self.路径点序列:
             for 序号 in range(len(self.路径点序列)).__reversed__():
                 路径点 = self.路径点序列[序号]
-                路径点 = 路径点 if isinstance(路径点, GPS坐标类) else 路径点.位置
-                if 路径点.坐标系 != GPS坐标系类型.智能推理坐标:
+                路径点 = 路径点 if isinstance(路径点, _GPS坐标类) else 路径点.位置
+                if 路径点.坐标系 != _GPS坐标系类型.智能推理坐标:
                     self.__GPS坐标系推理基准 = 路径点.坐标系
                     break
 
@@ -1603,14 +1615,14 @@ class 折线类:
     @property
     def 副本(self) -> '折线类':
         return 折线类(_deepcopy(self.路径点序列),
-                   self.显示转移方向,
-                   self.消息.副本,
-                   self.线条样式.副本,
-                   self.提示.副本,
-                   self.线上文本样式.副本,
-                   self.蚂蚁路径.副本)
+                      self.显示转移方向,
+                      self.消息.副本,
+                      self.线条样式.副本,
+                      self.提示.副本,
+                      self.线上文本样式.副本,
+                      self.蚂蚁路径.副本)
 
-    def 线段中心点序列(self, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> list[_线段中点类]:
+    def 线段中心点序列(self, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> list[_线段中点类]:
         """
         计算折线中每个一线段的中点位置,以及该线段的倾角,整理成 list[_线段中点类] 返回
         :param 目标坐标系: 指定坐标计算的基准GPS坐标系
@@ -1618,19 +1630,19 @@ class 折线类:
         """
         if not self.路径点序列 or len(self.路径点序列) < 2:
             return []
-        if 目标坐标系 == GPS坐标系类型.智能推理坐标:
+        if 目标坐标系 == _GPS坐标系类型.智能推理坐标:
             目标坐标系 = self.__GPS坐标系推理基准
         else:
             self.__GPS坐标系推理基准 = 目标坐标系
 
         中点序列: list[_线段中点类] = []
         for 路径点序号 in range(len(self.路径点序列) - 1):
-            起点位置: GPS坐标类 = self.路径点序列[路径点序号] if isinstance(self.路径点序列[路径点序号], GPS坐标类) else self.路径点序列[路径点序号].位置
-            终点位置: GPS坐标类 = self.路径点序列[路径点序号 + 1] if isinstance(self.路径点序列[路径点序号 + 1], GPS坐标类) else self.路径点序列[
+            起点位置: _GPS坐标类 = self.路径点序列[路径点序号] if isinstance(self.路径点序列[路径点序号], _GPS坐标类) else self.路径点序列[路径点序号].位置
+            终点位置: _GPS坐标类 = self.路径点序列[路径点序号 + 1] if isinstance(self.路径点序列[路径点序号 + 1], _GPS坐标类) else self.路径点序列[
                 路径点序号 + 1].位置
 
             # 起点的纬度线与终点的经度线交叉的点
-            经纬交点位置: GPS坐标类 = GPS坐标类(纬度=起点位置.纬度, 经度=终点位置.目标坐标(目标坐标系=起点位置.坐标系)[0], 坐标系=起点位置.坐标系)
+            经纬交点位置: _GPS坐标类 = _GPS坐标类(纬度=起点位置.纬度, 经度=终点位置.目标坐标(目标坐标系=起点位置.坐标系)[0], 坐标系=起点位置.坐标系)
             东西距离: float = 起点位置.球面距离(经纬交点位置).m
             南北距离: float = 终点位置.球面距离(经纬交点位置).m
 
@@ -1645,7 +1657,7 @@ class 折线类:
             纬度 = 0.5 * 起点位置.目标坐标(目标坐标系)[1] + 0.5 * 终点位置.目标坐标(目标坐标系)[1]
             经度 = 0.5 * 起点位置.目标坐标(目标坐标系)[0] + 0.5 * 终点位置.目标坐标(目标坐标系)[0]
 
-            中点位置: GPS坐标类 = GPS坐标类(纬度=纬度, 经度=经度, 坐标系=目标坐标系)
+            中点位置: _GPS坐标类 = _GPS坐标类(纬度=纬度, 经度=经度, 坐标系=目标坐标系)
 
             偏差系数: float
             # 迭代修正中点坐标, 实际测试表明,以下代码的修正逻辑,超过10次的迭代修正是没有意义的
@@ -1661,42 +1673,42 @@ class 折线类:
                 经度修正 = 起点位置.目标坐标(目标坐标系)[0] + (终点位置.目标坐标(目标坐标系)[0] - 起点位置.目标坐标(目标坐标系)[0]) * 0.5 * 偏差系数
 
                 # 生成新的中点位置
-                中点位置 = GPS坐标类(纬度=0.5 * (纬度 + 纬度修正), 经度=0.5 * (经度 + 经度修正), 坐标系=目标坐标系)
+                中点位置 = _GPS坐标类(纬度=0.5 * (纬度 + 纬度修正), 经度=0.5 * (经度 + 经度修正), 坐标系=目标坐标系)
 
             中点 = _线段中点类(位置=中点位置, 倾角=倾角)
             中点序列.append(中点)
         return 中点序列
 
-    def 添加路径点(self, 路径点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '折线类':
+    def 添加路径点(self, 路径点: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '折线类':
         """
         将指定的坐标点添加到该折线类对象的路径点序列中来
         :param 路径点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
         :return: self
         """
-        if type(路径点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 路径点 if isinstance(路径点, GPS坐标类) else 路径点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+        if type(路径点) in [_GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+            位置 = 路径点 if isinstance(路径点, _GPS坐标类) else 路径点.位置
+            if 位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                 位置.坐标系 = self.__GPS坐标系推理基准
             else:
                 self.__GPS坐标系推理基准 = 位置.坐标系
             self.路径点序列.append(路径点)
         return self
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         """
         :param 图层: folium.Map or folium.FeatureGroup; 用于收集 folium 对象的图层 或者 地图
-        :param 目标坐标系: GPS坐标系类型; 目标图层的坐标系类型
+        :param 目标坐标系: _GPS坐标系类型; 目标图层的坐标系类型
         :return: None
         """
         if self.有效:
             if type(图层) in [_folium.Map, _folium.FeatureGroup]:
-                if 目标坐标系 is None or 目标坐标系 == GPS坐标系类型.智能推理坐标:
+                if 目标坐标系 is None or 目标坐标系 == _GPS坐标系类型.智能推理坐标:
                     目标坐标系 = self.__GPS坐标系推理基准
 
                 # 生成路径点序列
                 纬经度坐标序列: list[list[float, float]] = []
                 for 路径点 in self.路径点序列:
-                    if isinstance(路径点, GPS坐标类) and 路径点.有效:
+                    if isinstance(路径点, _GPS坐标类) and 路径点.有效:
                         纬经度坐标序列.append(list(路径点.目标坐标(目标坐标系=目标坐标系))[::-1])
                     elif type(路径点) in [图标标记类, 圆圈标记类, 正多边形标记类] and 路径点.位置.有效:
                         纬经度坐标序列.append(list(路径点.位置.目标坐标(目标坐标系=目标坐标系))[::-1])
@@ -1764,8 +1776,8 @@ class 折线类:
             画板.添加一行('属性', '说明')
         else:
             画板.添加一行('属性', '说明').修饰行(_青字)
-        画板.添加一行('点序列:', '以包括有位置[GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义折线形标记的一系列折点位置')
-        画板.添加一行('', '可作为折点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('点序列:', '以包括有位置[_GPS坐标类]成员的类型对象或者GPS坐标类对象组成的对象列表,以定义折线形标记的一系列折点位置')
+        画板.添加一行('', '可作为折点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
         画板.添加一行('显示转移方向:', '是否在折线上以三角形的方式显示折线绘制的午后次序')
         画板.添加一行('消息:', '消息样式类对象,用于定义折线标记需要显示的消息样式信息')
         画板.添加一行('线条样式:', '线条样式类, 定义了折线标记的线条样式')
@@ -1782,8 +1794,9 @@ class 折线类:
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
         画板.添加一行('添加路径点:', '将指定的路径点对象添加到折线的折点列表中')
-        画板.添加一行('**路径点', '可被添加为路径点的对象类型有: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
-        画板.添加一行('_添加到图层:', '根据图标标记类数据结构的定义, 生成一个 folium.PolyLine 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('**路径点', '可被添加为路径点的对象类型有: _GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类')
+        画板.添加一行('_添加到图层:',
+                      '根据图标标记类数据结构的定义, 生成一个 folium.PolyLine 对象,并将该对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 folium.PolyLine 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 folium.PolyLine 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -1798,11 +1811,11 @@ class 参考线类:
     """
 
     def __init__(self,
-                 参考点: GPS坐标类 = None,
+                 参考点: _GPS坐标类 = None,
                  旋转deg: float = 0.0,
                  参考消息: str = None,
                  线条样式: 线条样式类 = 线条样式类()):
-        self.参考点: GPS坐标类 = 参考点
+        self.参考点: _GPS坐标类 = 参考点
         self.旋转deg: float = 旋转deg if type(旋转deg) in [float, int] else 0
         self.参考消息: str = 参考消息
         self.线条样式: 线条样式类 = 线条样式 if isinstance(线条样式, 线条样式类) else 线条样式类()
@@ -1810,7 +1823,7 @@ class 参考线类:
     # region 访问器
     @property
     def 有效(self) -> bool:
-        return self.参考点 and isinstance(self.参考点, GPS坐标类) and self.参考点.有效
+        return self.参考点 and isinstance(self.参考点, _GPS坐标类) and self.参考点.有效
 
     @property
     def 无效(self) -> bool:
@@ -1818,7 +1831,7 @@ class 参考线类:
 
     # endregion
 
-    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
+    def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> None:
         """
         以参考点为中心, 生成一个符合要求的折线,添加到图层上
         :param 图层: 用于收集 folium 对象的图层 或者 地图
@@ -1828,7 +1841,7 @@ class 参考线类:
         if self.有效:
             if type(图层) in [_folium.Map, _folium.FeatureGroup]:
                 # 处理目标坐标系
-                目标坐标系 = GPS坐标系类型.智能推理坐标 if 目标坐标系 is None else 目标坐标系
+                目标坐标系 = _GPS坐标系类型.智能推理坐标 if 目标坐标系 is None else 目标坐标系
 
                 # 处理线条样式
                 if self.线条样式.颜色 is None:
@@ -1840,26 +1853,26 @@ class 参考线类:
 
                 # 生成参考线上的文本样式
                 线上文本样式 = 线上文本样式类(文本属性字典={'fill': 'gray', 'font-size': 14},
-                                 偏移量px=12,
-                                 重复=True)
+                                              偏移量px=12,
+                                              重复=True)
 
                 # 生成一个折线对象
                 参考线 = 折线类(线条样式=self.线条样式)
 
                 # 生成参考线的两个端点坐标, 及线上文本内容
-                参考线端点1: GPS坐标类
-                参考线端点2: GPS坐标类
+                参考线端点1: _GPS坐标类
+                参考线端点2: _GPS坐标类
                 线上文本: str
                 if self.旋转deg == 0:
                     # 这是一个参考纬线, 端点1位于左侧 -720 位置, 端点2位于右侧 720 位置
-                    参考线端点1 = GPS坐标类(-720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
-                    参考线端点2 = GPS坐标类(720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
+                    参考线端点1 = _GPS坐标类(-720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
+                    参考线端点2 = _GPS坐标类(720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
                     线上文本 = ' ' * 5 + (
                         f'{"北纬" if 参考线端点1.纬度 > 0 else "南纬"}: {abs(参考线端点1.纬度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
                 else:
                     # 暂不支持倾斜的参考线,如果有倾斜角度的,一律处理成经线
-                    参考线端点1 = GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], -90, 目标坐标系)
-                    参考线端点2 = GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], 90, 目标坐标系)
+                    参考线端点1 = _GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], -90, 目标坐标系)
+                    参考线端点2 = _GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], 90, 目标坐标系)
                     线上文本 = ' ' * 5 + (
                         f'{"东经" if 参考线端点1.经度 > 0 else "西经"}: {abs(参考线端点1.经度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
 
@@ -1880,7 +1893,7 @@ class 参考线类:
         画板.添加分隔行('参考线类定义了一个参考线类的数据结构')
 
         """
-                参考点: GPS坐标类 = None,
+                参考点: _GPS坐标类 = None,
                  旋转deg: float = 0.0,
                  参考消息: str = None,
                  线条样式: 线条样式类 = 线条样式类()):
@@ -1891,7 +1904,7 @@ class 参考线类:
         else:
             画板.添加一行('属性', '说明').修饰行(_青字)
         画板.添加一行('参考点:', 'GPS坐标类对象,用于定义参考线的位置')
-        画板.添加一行('', '可作为参考点对象类型有: GPS坐标类')
+        画板.添加一行('', '可作为参考点对象类型有: _GPS坐标类')
         画板.添加一行('旋转deg:', '定义参考线相对于纬线方向的旋转角度。 0deg: 平行于纬线, 非0deg: 平行于经线')
         画板.添加一行('参考消息:', '消息样式类对象,用于定义参考线的需要显示的消息样式信息')
         画板.添加一行('线条样式:', '线条样式类, 定义了参考线的线条样式')
@@ -1903,7 +1916,8 @@ class 参考线类:
             画板.添加一行('方法', '说明')
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
-        画板.添加一行('_添加到图层:', '根据参考线类数据结构的定义, 生成一个 折线类 对象,并将该 折线类 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
+        画板.添加一行('_添加到图层:',
+                      '根据参考线类数据结构的定义, 生成一个 折线类 对象,并将该 折线类 对象添加到指定的 folium.Map 或者 folium.FeatureGroup 对象中')
         画板.添加一行('**图层:', '指定需要添加 折线类 对象的 folium.Map 或者 folium.FeatureGroup 对象')
         画板.添加一行('**目标坐标系:', '指定需要添加 折线类 对象的 folium.Map 或者 folium.FeatureGroup 对象 的坐标系类型')
 
@@ -1959,19 +1973,19 @@ class 热力层类:
 
     # endregion
 
-    def 添加热力点(self, 热力点: 热力点类 or GPS坐标类) -> '热力层类':
+    def 添加热力点(self, 热力点: 热力点类 or _GPS坐标类) -> '热力层类':
         """
-        将指定的热力点类, 或者 GPS坐标类, 添加到热力图层中来
+        将指定的热力点类, 或者 _GPS坐标类, 添加到热力图层中来
         :param 热力点:  热力点类对象, 或者 GPS坐标类对象
         :return: self
         """
         if isinstance(热力点, 热力点类):
             self.__热力点序列.append(热力点)
-        elif isinstance(热力点, GPS坐标类):
+        elif isinstance(热力点, _GPS坐标类):
             self.__热力点序列.append(热力点类(位置=热力点))
         return self
 
-    def _heatMap对象(self, 底图坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> _plugins.HeatMap:
+    def _heatMap对象(self, 底图坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标) -> _plugins.HeatMap:
         """
         将热力数据 根据指定的坐标系生成 _plugins.HeatMap 对象并返回该对象
         :param 底图坐标系: 目标地图中的坐标系类型
@@ -1981,7 +1995,7 @@ class 热力层类:
             return _plugins.HeatMap(data=[[0, 0, 1]])
 
         # 处理目标坐标系
-        目标坐标系 = GPS坐标系类型.智能推理坐标 if 底图坐标系 is None else 底图坐标系
+        目标坐标系 = _GPS坐标系类型.智能推理坐标 if 底图坐标系 is None else 底图坐标系
 
         # 处理入参值
         self.热力斑半径px = int(self.热力斑半径px) if type(self.热力斑半径px) in [float, int] else 25
@@ -2007,8 +2021,8 @@ class 热力层类:
         for 热力点 in self.__热力点序列:
             if 热力点.有效:
                 热力数据.append([热力点.位置.目标坐标(目标坐标系)[1],
-                             热力点.位置.目标坐标(目标坐标系)[0],
-                             热力点.权值 if (type(热力点.权值) in [float, int]) and (热力点.权值 > 0) else 1])
+                                 热力点.位置.目标坐标(目标坐标系)[0],
+                                 热力点.权值 if (type(热力点.权值) in [float, int]) and (热力点.权值 > 0) else 1])
         if 热力数据:
             return _plugins.HeatMap(data=热力数据,
                                     name=str(self.__图层名称).strip() if self.可控制 else None,
@@ -2031,7 +2045,7 @@ class 热力层类:
         else:
             画板.添加一行('属性', '说明').修饰行(_青字)
         画板.添加一行('热力点序列:', '一个由 GPS坐标类对象或者 热力点类 对象组成的对象序列, 热力点序列体现了不同位置的热力值信息')
-        画板.添加一行('', '可作为热力点的对象类型有: GPS坐标类 or 热力点类')
+        画板.添加一行('', '可作为热力点的对象类型有: _GPS坐标类 or 热力点类')
         画板.添加一行('热力点数量', '热力图层上存在的热力点的数量')
         画板.添加一行('图层名称:', '热力层所在的图层的名称')
         画板.添加一行('默认显示:', '热力层图层是否默认为显示状态')
@@ -2048,7 +2062,7 @@ class 热力层类:
         else:
             画板.添加一行('方法', '说明').修饰行(_青字)
         画板.添加一行('添加热力点:', '将指定的 GPS坐标类对象 或者 热力点类对象添加到热力点列表中')
-        画板.添加一行('**热力点', '可被添加为热力点的对象类型有: GPS坐标类 or 热力点类')
+        画板.添加一行('**热力点', '可被添加为热力点的对象类型有: _GPS坐标类 or 热力点类')
         画板.添加一行('heatMap对象:', '根据热力层数据结构的定义, 生成一个 plugins.HeatMap 对象, 并返回该对象')
         画板.添加一行('**目标坐标系:', '指定需要生成的 plugins.HeatMap 对象 所适配的的坐标系类型')
 
@@ -2090,7 +2104,7 @@ class 图层类:
         return False
 
     # endregion
-    def _featureGroup对象(self, 底图坐标系: GPS坐标系类型 = GPS坐标系类型.wgs84) -> _folium.FeatureGroup:
+    def _featureGroup对象(self, 底图坐标系: _GPS坐标系类型 = _GPS坐标系类型.wgs84) -> _folium.FeatureGroup:
         # 生成 FeatureGroup 对象
         图层: _folium.FeatureGroup
         if self.可控制:
@@ -2143,6 +2157,7 @@ class _添加瓦片工具箱类:
     本工具箱中所搜集的地图瓦片信息,参考自: https://blog.csdn.net/yz_weixiao/article/details/121971334
     您可以通过兴趣的瓦片地图方法查阅其 __doc__ 信息, 例如 对象.添加瓦片.高德地图.__doc__
     """
+
     def __init__(self, 地图: '地图类' = None):
         self.地图: '地图类' = 地图
 
@@ -2207,9 +2222,10 @@ class 地图类:
     """
     定义了地图的数据结构，您可以通过 地图类.帮助文档() 或者 地图类.帮助文档() 来打印相关的帮助信息
     """
+
     def __init__(self,
-                 中心点: GPS坐标类 = None,
-                 基准坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标,
+                 中心点: _GPS坐标类 = None,
+                 基准坐标系: _GPS坐标系类型 = _GPS坐标系类型.智能推理坐标,
                  初始缩放倍数: int = 5,
                  显示比例尺: bool = True):
         self.Map: _folium.Map or None = None
@@ -2220,10 +2236,10 @@ class 地图类:
 
         self.__资源置换器: callable = None
 
-        self.底图坐标系: GPS坐标系类型 = 基准坐标系
-        self.__GPS坐标系推理基准: GPS坐标系类型 = self.底图坐标系
+        self.底图坐标系: _GPS坐标系类型 = 基准坐标系
+        self.__GPS坐标系推理基准: _GPS坐标系类型 = self.底图坐标系
 
-        self.__中心点: GPS坐标类 = 中心点 if isinstance(中心点, GPS坐标类) else GPS坐标类()
+        self.__中心点: _GPS坐标类 = 中心点 if isinstance(中心点, _GPS坐标类) else _GPS坐标类()
 
         # 地图数据
         self.__基地列表: list[图标标记类] = []
@@ -2321,44 +2337,44 @@ class 地图类:
         return self.__位置拾取
 
     @property
-    def 中心点(self) -> GPS坐标类:
+    def 中心点(self) -> _GPS坐标类:
         if self.__中心点.有效:
             return self.__中心点.副本
         elif 有效基地坐标列表 := [标记.位置 for 标记 in self.__基地列表 if 标记.位置.有效]:
             经度和: float = sum([位置.wgs84坐标[0] for 位置 in 有效基地坐标列表])
             纬度和: float = sum([位置.wgs84坐标[1] for 位置 in 有效基地坐标列表])
             坐标数: int = len(有效基地坐标列表)
-            return GPS坐标类(经度=经度和 / 坐标数, 纬度=纬度和 / 坐标数, 坐标系=GPS坐标系类型.wgs84)
-        return GPS坐标类(0, 0)
+            return _GPS坐标类(经度=经度和 / 坐标数, 纬度=纬度和 / 坐标数, 坐标系=_GPS坐标系类型.wgs84)
+        return _GPS坐标类(0, 0)
 
     @中心点.setter
-    def 中心点(self, 坐标: GPS坐标类):
+    def 中心点(self, 坐标: _GPS坐标类):
         self.__中心点 = 坐标
 
     @property
     def 允许资源置换(self) -> '地图类':
         资源置换表: dict[str, str] = {r'src="https.*/jquery.*.min.js"': r'src="./src/jQuery/jquery-2.0.0.js"',
-                                 r'src="https.*/leaflet.js"': r'src="./src/leaflet/leaflet.js"',
-                                 r'src="https.*/bootstrap.min.js"': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"',
-                                 r'src="https.*/leaflet.awesome-markers.js"': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"',
-                                 r'src="https.*/leaflet.markercluster.js"': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"',
-                                 r'src="https.*/leaflet-dvf.markers.min.js"': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"',
-                                 r'src="https.*/dist/js/bootstrap.bundle.min.js"': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"',
-                                 r'src="https.*/dist/leaflet-measure.min.js"': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"',
-                                 r'src="https.*/leaflet.textpath.min.js"': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"',
-                                 r'src="https.*/templates/leaflet_heat.min.js"': r'src="./src/leaflet/leaflet_heat.min.js"',
-                                 r'src="https.*/dist/leaflet-ant-path.min.js"': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"',
-                                 r'href="https.*/dist/leaflet.css"': r'href="./src/leaflet/leaflet.css"',
-                                 r'href="https.*/bootstrap.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"',
-                                 r'href="https.*/bootstrap-theme.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"',
-                                 r'href="https.*/css/font-awesome.min.css"': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"',
-                                 r'href="https.*/leaflet.awesome-markers.css"': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"',
-                                 r'href="https:.*/leaflet.awesome.rotate.min.css"': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"',
-                                 r'href="https.*/MarkerCluster.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"',
-                                 r'href="https.*/MarkerCluster.Default.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"',
-                                 r'href="https.*/fontawesome.*/css/all.min.css"': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"',
-                                 r'href="https.*/dist/leaflet-measure.min.css"': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'
-                                 }
+                                      r'src="https.*/leaflet.js"': r'src="./src/leaflet/leaflet.js"',
+                                      r'src="https.*/bootstrap.min.js"': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"',
+                                      r'src="https.*/leaflet.awesome-markers.js"': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"',
+                                      r'src="https.*/leaflet.markercluster.js"': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"',
+                                      r'src="https.*/leaflet-dvf.markers.min.js"': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"',
+                                      r'src="https.*/dist/js/bootstrap.bundle.min.js"': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"',
+                                      r'src="https.*/dist/leaflet-measure.min.js"': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"',
+                                      r'src="https.*/leaflet.textpath.min.js"': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"',
+                                      r'src="https.*/templates/leaflet_heat.min.js"': r'src="./src/leaflet/leaflet_heat.min.js"',
+                                      r'src="https.*/dist/leaflet-ant-path.min.js"': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"',
+                                      r'href="https.*/dist/leaflet.css"': r'href="./src/leaflet/leaflet.css"',
+                                      r'href="https.*/bootstrap.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"',
+                                      r'href="https.*/bootstrap-theme.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"',
+                                      r'href="https.*/css/font-awesome.min.css"': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"',
+                                      r'href="https.*/leaflet.awesome-markers.css"': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"',
+                                      r'href="https:.*/leaflet.awesome.rotate.min.css"': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"',
+                                      r'href="https.*/MarkerCluster.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"',
+                                      r'href="https.*/MarkerCluster.Default.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"',
+                                      r'href="https.*/fontawesome.*/css/all.min.css"': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"',
+                                      r'href="https.*/dist/leaflet-measure.min.css"': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'
+                                      }
 
         if not 资源置换表:
             self.__资源置换器 = None
@@ -2395,7 +2411,7 @@ class 地图类:
     # endregion
 
     # region 瓦片处理
-    def 添加地图瓦片(self, 瓦片: _folium.TileLayer, 瓦片坐标系: GPS坐标系类型 = GPS坐标系类型.wgs84) -> '地图类':
+    def 添加地图瓦片(self, 瓦片: _folium.TileLayer, 瓦片坐标系: _GPS坐标系类型 = _GPS坐标系类型.wgs84) -> '地图类':
         """
         向 folium.Map 对象中添加 tiles 信息
         :param 瓦片: 指定要添加的瓦片对象(folium.TileLayer对象)
@@ -2410,7 +2426,7 @@ class 地图类:
                 瓦片可添加 = False
 
             if 瓦片可添加:
-                if not self.__基准瓦片 and self.__GPS坐标系推理基准 == GPS坐标系类型.智能推理坐标:
+                if not self.__基准瓦片 and self.__GPS坐标系推理基准 == _GPS坐标系类型.智能推理坐标:
                     # 第一个添加的瓦片,会联动调整底图坐标系
                     self.底图坐标系 = 瓦片坐标系
                     self.__GPS坐标系推理基准 = self.底图坐标系
@@ -2419,11 +2435,11 @@ class 地图类:
         return self
 
     def __添加地图瓦片(self,
-                 瓦片链接: str,
-                 瓦片属性: str,
-                 瓦片名称: str,
-                 tms: bool = False,
-                 瓦片坐标系: GPS坐标系类型 = GPS坐标系类型.wgs84) -> _添加瓦片工具箱类:
+                       瓦片链接: str,
+                       瓦片属性: str,
+                       瓦片名称: str,
+                       tms: bool = False,
+                       瓦片坐标系: _GPS坐标系类型 = _GPS坐标系类型.wgs84) -> _添加瓦片工具箱类:
         瓦片属性 = str(瓦片属性).strip()
         瓦片链接 = str(瓦片链接).strip()
         瓦片名称 = str(瓦片名称 if 瓦片名称 else 'OpenStreetMap').strip()
@@ -2432,13 +2448,13 @@ class 地图类:
             瓦片: _folium.TileLayer
             if tms:
                 瓦片 = _folium.TileLayer(tiles=瓦片链接,
-                                       tms='true',
-                                       attr=瓦片属性 if 瓦片属性 else None,
-                                       name=瓦片名称 if 瓦片名称 else None)
+                                         tms='true',
+                                         attr=瓦片属性 if 瓦片属性 else None,
+                                         name=瓦片名称 if 瓦片名称 else None)
             else:
                 瓦片 = _folium.TileLayer(tiles=瓦片链接,
-                                       attr=瓦片属性 if 瓦片属性 else None,
-                                       name=瓦片名称 if 瓦片名称 else None)
+                                         attr=瓦片属性 if 瓦片属性 else None,
+                                         name=瓦片名称 if 瓦片名称 else None)
 
             瓦片可添加: bool = True
             if 瓦片.tiles in [瓦片.tiles for 瓦片 in self.__基准瓦片]:
@@ -2447,7 +2463,7 @@ class 地图类:
                 瓦片可添加 = False
 
             if 瓦片可添加:
-                if not self.__基准瓦片 and self.__GPS坐标系推理基准 == GPS坐标系类型.智能推理坐标:
+                if not self.__基准瓦片 and self.__GPS坐标系推理基准 == _GPS坐标系类型.智能推理坐标:
                     # 第一个添加的瓦片,会联动调整底图坐标系
                     self.底图坐标系 = 瓦片坐标系
                     self.__GPS坐标系推理基准 = self.底图坐标系
@@ -2486,7 +2502,7 @@ class 地图类:
             瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7',
             瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片坐标系=_GPS坐标系类型.高德地图坐标)
 
     def __添加高德中英地图瓦片(self, 瓦片名称: str = '高德中英地图') -> _添加瓦片工具箱类:
         """
@@ -2498,7 +2514,7 @@ class 地图类:
             瓦片链接='https://webrd02.is.autonavi.com/appmaptile?lang=zh_en&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
             瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片坐标系=_GPS坐标系类型.高德地图坐标)
 
     def __添加高德路网地图瓦片(self, 瓦片名称: str = '高德路网地图') -> _添加瓦片工具箱类:
         """
@@ -2510,7 +2526,7 @@ class 地图类:
             瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8&ltype=11',
             瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片坐标系=_GPS坐标系类型.高德地图坐标)
 
     def __添加高德卫星地图瓦片(self, 瓦片名称: str = '高德卫星地图') -> _添加瓦片工具箱类:
         """
@@ -2522,7 +2538,7 @@ class 地图类:
             瓦片链接='http://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
             瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片坐标系=_GPS坐标系类型.高德地图坐标)
 
     def __添加智图GeoQ瓦片(self, 瓦片名称: str = '智图GeoQ') -> _添加瓦片工具箱类:
         """
@@ -2534,7 +2550,7 @@ class 地图类:
             瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}',
             瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片坐标系=_GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ灰色版瓦片(self, 瓦片名称: str = '智图GeoQ灰色版') -> _添加瓦片工具箱类:
         """
@@ -2546,7 +2562,7 @@ class 地图类:
             瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}',
             瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片坐标系=_GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ中国行政区划边界瓦片(self, 瓦片名称: str = '智图GeoQ中国行政区划边界') -> _添加瓦片工具箱类:
         """
@@ -2558,7 +2574,7 @@ class 地图类:
             瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/administrative_division_boundaryandlabel/MapServer/tile/{z}/{y}/{x}',
             瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片坐标系=_GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ中国水系瓦片(self, 瓦片名称: str = '智图GeoQ中国水系') -> _添加瓦片工具箱类:
         """
@@ -2570,7 +2586,7 @@ class 地图类:
             瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/WorldHydroMap/MapServer/tile/{z}/{y}/{x}',
             瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片坐标系=_GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ灰度路网瓦片(self, 瓦片名称: str = '智图GeoQ灰度路网') -> _添加瓦片工具箱类:
         """
@@ -2582,7 +2598,7 @@ class 地图类:
             瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Gray_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
             瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片坐标系=_GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ暖色路网瓦片(self, 瓦片名称: str = '智图GeoQ暖色路网') -> _添加瓦片工具箱类:
         """
@@ -2594,7 +2610,7 @@ class 地图类:
             瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Warm_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
             瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片坐标系=_GPS坐标系类型.gcj02)
 
     def __添加腾讯瓦片(self, 瓦片名称: str = '腾讯地图') -> _添加瓦片工具箱类:
         """
@@ -2606,13 +2622,13 @@ class 地图类:
             瓦片链接='https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={-y}',
             瓦片属性="&copy; <a target='_blank' href=https://map.qq.com/m/index/map>腾讯地图</a>",
             瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.腾讯地图坐标)
+            瓦片坐标系=_GPS坐标系类型.腾讯地图坐标)
 
     # endregion
 
     def 添加图层(self,
-             图层名称: str = None,
-             默认显示: bool = False) -> int:
+                 图层名称: str = None,
+                 默认显示: bool = False) -> int:
         """
         向图层表中添加一个图层对象,并返回所添加的图层的图层号
         :param 图层名称: 图层的名称
@@ -2640,11 +2656,11 @@ class 地图类:
         return -1
 
     def 添加热力层(self,
-              图层名称: str = None,
-              默认显示: bool = False,
-              热力斑半径px: int = 25,
-              晕染宽度px: int = 15,
-              着色梯度字典: dict[float, str or 颜色名] = None) -> int:
+                   图层名称: str = None,
+                   默认显示: bool = False,
+                   热力斑半径px: int = 25,
+                   晕染宽度px: int = 15,
+                   着色梯度字典: dict[float, str or 颜色名] = None) -> int:
         """
         向图层表中添加一个热力层的图层, 并返回添加的图层号
         :param 图层名称: 所添加的图层的名称
@@ -2665,11 +2681,11 @@ class 地图类:
         if 可添加:
             # 如果图层可以添加, 则添加一个新的图层,并返回图层号
             self.__图层表.append(热力层类(热力点序列=[],
-                                   图层名称=图层名称,
-                                   默认显示=默认显示,
-                                   热力斑半径px=热力斑半径px,
-                                   晕染宽度px=晕染宽度px,
-                                   着色梯度字典=着色梯度字典))
+                                          图层名称=图层名称,
+                                          默认显示=默认显示,
+                                          热力斑半径px=热力斑半径px,
+                                          晕染宽度px=晕染宽度px,
+                                          着色梯度字典=着色梯度字典))
             return len(self.__图层表) - 1
         else:
             for 图层号 in range(len(self.__图层表)):
@@ -2679,16 +2695,16 @@ class 地图类:
         # 如果以上努力均没有成果,则返回-1, 不指向任何图层
         return -1
 
-    def 添加基地(self, 基地标记: GPS坐标类 or 图标标记类 or list[GPS坐标类 or 图标标记类]) -> '地图类':
+    def 添加基地(self, 基地标记: _GPS坐标类 or 图标标记类 or list[_GPS坐标类 or 图标标记类]) -> '地图类':
         """
         向地图的底图中添加标记点,做为基地标记
-        :param 基地标记: GPS坐标类, 或者 图标标记类, 或者是列表, 指定要添加的基地的位置
+        :param 基地标记: _GPS坐标类, 或者 图标标记类, 或者是列表, 指定要添加的基地的位置
         :return: self
         """
 
-        def 添加基地标记(标记: GPS坐标类 or 图标标记类) -> None:
+        def 添加基地标记(标记: _GPS坐标类 or 图标标记类) -> None:
             基地图标: 图标标记类
-            if isinstance(标记, GPS坐标类):
+            if isinstance(标记, _GPS坐标类):
                 基地图标 = 图标标记类(位置=标记)
             elif isinstance(标记, 图标标记类):
                 基地图标 = 标记
@@ -2702,14 +2718,14 @@ class 地图类:
                     if not 基地图标.图标.颜色:
                         基地图标.图标.颜色 = 颜色名.黑
 
-                if 基地图标.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                if 基地图标.位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                     基地图标.位置.坐标系 = self.__GPS坐标系推理基准
                 else:
                     self.__GPS坐标系推理基准 = 基地图标.位置.坐标系
 
                 self.__基地列表.append(基地图标)
 
-        待添加标记列表: list[GPS坐标类 or 图标标记类]
+        待添加标记列表: list[_GPS坐标类 or 图标标记类]
         if type(基地标记) is list:
             待添加标记列表 = 基地标记
         else:
@@ -2719,7 +2735,7 @@ class 地图类:
             添加基地标记(标记=标记)
         return self
 
-    def 添加热力点(self, 图层号: int, 热力点: GPS坐标类 or 热力点类 or list[GPS坐标类 or 热力点类]) -> '地图类':
+    def 添加热力点(self, 图层号: int, 热力点: _GPS坐标类 or 热力点类 or list[_GPS坐标类 or 热力点类]) -> '地图类':
         """
         将指定的 GPS坐标 或者 热力点 添加到指定的图层上
         :param 图层号: 指定的目标图层, 如果指定的图层不是热力层,则无法添加
@@ -2730,19 +2746,19 @@ class 地图类:
             待添加热力点: list[热力点类] = []
             if isinstance(热力点, 热力点类):
                 待添加热力点.append(热力点)
-            elif isinstance(热力点, GPS坐标类):
+            elif isinstance(热力点, _GPS坐标类):
                 待添加热力点.append(热力点类(位置=热力点))
             elif isinstance(热力点, list):
                 for 这个点 in 热力点:
                     if isinstance(这个点, 热力点类):
                         待添加热力点.append(这个点)
-                    elif isinstance(这个点, GPS坐标类):
+                    elif isinstance(这个点, _GPS坐标类):
                         待添加热力点.append(热力点类(位置=这个点))
 
             if 待添加热力点:
                 # 推理GPS坐标系
                 for 热点 in 待添加热力点:
-                    if 热点.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                    if 热点.位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                         热点.位置.坐标系 = self.__GPS坐标系推理基准
                     else:
                         self.__GPS坐标系推理基准 = 热点.位置.坐标系
@@ -2772,7 +2788,7 @@ class 地图类:
                 for 标记 in 待添加标记:
                     # 推理坐标系类型
                     if type(标记) in [图标标记类, 圆圈标记类]:
-                        if 标记.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                        if 标记.位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                             标记.位置.坐标系 = self.__GPS坐标系推理基准
                         else:
                             self.__GPS坐标系推理基准 = 标记.位置.坐标系
@@ -2780,12 +2796,12 @@ class 地图类:
                         if 标记.路径点序列:
                             for 路径点 in 标记.路径点序列:
                                 if type(路径点) in [图标标记类, 圆圈标记类]:
-                                    if 路径点.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                                    if 路径点.位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                                         路径点.位置.坐标系 = self.__GPS坐标系推理基准
                                     else:
                                         self.__GPS坐标系推理基准 = 路径点.位置.坐标系
-                                elif isinstance(路径点, GPS坐标类):
-                                    if 路径点.坐标系 == GPS坐标系类型.智能推理坐标:
+                                elif isinstance(路径点, _GPS坐标类):
+                                    if 路径点.坐标系 == _GPS坐标系类型.智能推理坐标:
                                         路径点.坐标系 = self.__GPS坐标系推理基准
                                     else:
                                         self.__GPS坐标系推理基准 = 路径点.坐标系
@@ -2793,31 +2809,31 @@ class 地图类:
                             if 标记.蚂蚁路径.路径点序列:
                                 for 路径点 in 标记.蚂蚁路径.路径点序列:
                                     if type(路径点) in [图标标记类, 圆圈标记类]:
-                                        if 路径点.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                                        if 路径点.位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                                             路径点.位置.坐标系 = self.__GPS坐标系推理基准
                                         else:
                                             self.__GPS坐标系推理基准 = 路径点.位置.坐标系
-                                    elif isinstance(路径点, GPS坐标类):
-                                        if 路径点.坐标系 == GPS坐标系类型.智能推理坐标:
+                                    elif isinstance(路径点, _GPS坐标类):
+                                        if 路径点.坐标系 == _GPS坐标系类型.智能推理坐标:
                                             路径点.坐标系 = self.__GPS坐标系推理基准
                                         else:
                                             self.__GPS坐标系推理基准 = 路径点.坐标系
                     elif isinstance(标记, 矩形标记类):
                         for 角点 in 标记.对角点序列:
                             if type(角点) in [图标标记类, 圆圈标记类]:
-                                if 角点.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                                if 角点.位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                                     角点.位置.坐标系 = self.__GPS坐标系推理基准
                                 else:
                                     self.__GPS坐标系推理基准 = 角点.位置.坐标系
-                            elif isinstance(角点, GPS坐标类):
-                                if 角点.坐标系 == GPS坐标系类型.智能推理坐标:
+                            elif isinstance(角点, _GPS坐标类):
+                                if 角点.坐标系 == _GPS坐标系类型.智能推理坐标:
                                     角点.坐标系 = self.__GPS坐标系推理基准
                                 else:
                                     self.__GPS坐标系推理基准 = 角点.坐标系
                     elif isinstance(标记, 正多边形标记类):
-                        位置: GPS坐标类 = 标记.位置 if isinstance(标记, 图标标记类) else 标记.位置
+                        位置: _GPS坐标类 = 标记.位置 if isinstance(标记, 图标标记类) else 标记.位置
                         if 位置.有效:
-                            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                            if 位置.坐标系 == _GPS坐标系类型.智能推理坐标:
                                 位置.坐标系 = self.__GPS坐标系推理基准
                             else:
                                 self.__GPS坐标系推理基准 = 位置.坐标系
@@ -2826,9 +2842,9 @@ class 地图类:
         return self
 
     def 添加参考纬线(self,
-               参考点: GPS坐标类 or list[GPS坐标类] = GPS坐标类(0, 0),
-               参考消息: str = None,
-               线条样式: 线条样式类 = 线条样式类()) -> None:
+                     参考点: _GPS坐标类 or list[_GPS坐标类] = _GPS坐标类(0, 0),
+                     参考消息: str = None,
+                     线条样式: 线条样式类 = 线条样式类()) -> None:
         """
         向地图的底图中添加一个平行于纬线的折线线段作为参考线,这个参考线经过指定的坐标点
         :param 参考点: 所添加的参考线需要经过的参考点, GPS坐标类对象,或者是列表
@@ -2836,25 +2852,25 @@ class 地图类:
         :param 线条样式: 所添加的参考线的线形样式
         :return: self
         """
-        if isinstance(参考点, GPS坐标类) and 参考点.有效:
+        if isinstance(参考点, _GPS坐标类) and 参考点.有效:
             参考线: 参考线类 = 参考线类(参考点=参考点,
-                             旋转deg=0,
-                             参考消息=参考消息,
-                             线条样式=线条样式)
+                                        旋转deg=0,
+                                        参考消息=参考消息,
+                                        线条样式=线条样式)
             self.__参考线列表.append(参考线)
         elif isinstance(参考点, list):
             for 点 in 参考点:
-                if isinstance(点, GPS坐标类) and 点.有效:
+                if isinstance(点, _GPS坐标类) and 点.有效:
                     参考线: 参考线类 = 参考线类(参考点=点,
-                                     旋转deg=0,
-                                     参考消息=参考消息,
-                                     线条样式=线条样式)
+                                                旋转deg=0,
+                                                参考消息=参考消息,
+                                                线条样式=线条样式)
                     self.__参考线列表.append(参考线)
 
     def 添加参考经线(self,
-               参考点: GPS坐标类 or list[GPS坐标类] = GPS坐标类(0, 0),
-               参考消息: str = None,
-               线条样式: 线条样式类 = 线条样式类()) -> None:
+                     参考点: _GPS坐标类 or list[_GPS坐标类] = _GPS坐标类(0, 0),
+                     参考消息: str = None,
+                     线条样式: 线条样式类 = 线条样式类()) -> None:
         """
         向地图的底图中添加一个平行于经线的折线线段作为参考线,这个参考线经过指定的坐标点
         :param 参考点: 所添加的参考线需要经过的参考点, GPS坐标类对象,或者是列表
@@ -2862,25 +2878,25 @@ class 地图类:
         :param 线条样式: 所添加的参考线的线形样式
         :return: self
         """
-        if isinstance(参考点, GPS坐标类) and 参考点.有效:
+        if isinstance(参考点, _GPS坐标类) and 参考点.有效:
             参考线: 参考线类 = 参考线类(参考点=参考点,
-                             旋转deg=90,
-                             参考消息=参考消息,
-                             线条样式=线条样式)
+                                        旋转deg=90,
+                                        参考消息=参考消息,
+                                        线条样式=线条样式)
             self.__参考线列表.append(参考线)
         elif isinstance(参考点, list):
             for 点 in 参考点:
-                if isinstance(点, GPS坐标类) and 点.有效:
+                if isinstance(点, _GPS坐标类) and 点.有效:
                     参考线: 参考线类 = 参考线类(参考点=点,
-                                     旋转deg=90,
-                                     参考消息=参考消息,
-                                     线条样式=线条样式)
+                                                旋转deg=90,
+                                                参考消息=参考消息,
+                                                线条样式=线条样式)
                     self.__参考线列表.append(参考线)
 
     def 添加参考经纬线(self,
-                参考点: GPS坐标类 or list[GPS坐标类] = GPS坐标类(0, 0),
-                参考消息: str = None,
-                线条样式: 线条样式类 = None):
+                       参考点: _GPS坐标类 or list[_GPS坐标类] = _GPS坐标类(0, 0),
+                       参考消息: str = None,
+                       线条样式: 线条样式类 = None):
         """
         根据指定参数,向指定的参考点位置添加一条平行于纬线的参考线,再添加一条平行于经线的参考线
         :param 参考点: 指定要添加的参考线所经过的参考点
@@ -2915,11 +2931,11 @@ class 地图类:
 
         # region 生成 Map 对象
         self.Map = _folium.Map(location=self.中心点.目标坐标(self.底图坐标系)[::-1],
-                              zoom_start=self.初始缩放倍数,
-                              control_scale=self.显示比例尺,
-                              min_zoom=0,
-                              max_zoom=19,
-                              tiles=None if self.__基准瓦片 else 'OpenStreetMap')
+                               zoom_start=self.初始缩放倍数,
+                               control_scale=self.显示比例尺,
+                               min_zoom=0,
+                               max_zoom=19,
+                               tiles=None if self.__基准瓦片 else 'OpenStreetMap')
         # endregion
 
         # region 如果有网页标题,则添加网页标题
@@ -2989,7 +3005,7 @@ class 地图类:
         # region 如果有控制需求,则添加控制层
         if 控制层数量 > 0:
             self.Map.add_child(_folium.LayerControl(collapsed=False if (控制层数量 + (瓦片数量 if 瓦片数量 > 1 else 0) < 10) else True,
-                                                   autoZIndex=True))
+                                                    autoZIndex=True))
         # endregion
 
         return self.Map
