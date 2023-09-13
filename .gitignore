@@ -136,3 +136,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# 忽略 gitVer 管理相关的中间文档
+publish.py
+gitVer.cs
+csDocBuildWithGitVersion.py
+autoGitCommit.bat

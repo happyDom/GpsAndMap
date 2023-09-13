@@ -1,0 +1,16 @@
+{
+	"productId": "eb7e1298-eddf-7cac-d777-a7a2dd25c8e1",
+	"majorBranchName": "master",
+	"tagPrefix_major": "m",
+	"minorBranchName": "release",
+	"tagPrefix_minor": "r",
+	"anchorChar": "⚓",
+	"mySql": {
+		"host": "",
+		"user": "",
+		"pwd": "",
+		"db": "",
+		"charset": "utf8",
+		"table": ""
+	}
+}
