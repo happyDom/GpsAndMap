@@ -98,7 +98,40 @@ from GpsAndMap.GpsModule import *
 ```
 打印截图一角如下:
 ![img.png](img.png)
+---
+### GpsAndMap.MapModule 模块
+👉**MapModule**模块主要基于**GPS坐标类**, 对**folium**模块进行了二次封装, 以使对**folium**对象的操作是基于**GPS坐标类**对象的.
 
+👉**MapModule**模块支持folium.Map对象生成与对应的html文档生成,支持简单的图层管理
+
+👉**MapModule**模块支持添打点(Marker)标记, 圆圈(Circle)标记, 多边形/正多边形(Polygon)标记,折线(PolyLine)标记,以及这些标记上附带的弹窗消息,提示消息,以及样式信息
+
+👉**MapModule**模块支持添加热力图,支持添加经度参考线,支持添加纬度参考线
+
+👉**MapModule**模块支持添加坐标拾取,鼠标打点,鼠标绘图,蚂蚁路径等folium.plugins功能
+
+👉**MapModule**模块支持直接添加和使用12+种瓦片底图,包括google, 高德系列, 智图GeoQ系列
+
+👇 以代码演示了如何向地图中添加指定的瓦片底图, 并将Map对象保存为html以供阅览
+```python
+# -*- coding:UTF-8 -*-
+
+# region 引入必要依赖
+from src.GpsAndMap.MapModule import *
+
+# endregion
+
+地图 = 地图类(中心点=常用坐标.北京市).添加瓦片.高德地图().智图GeoQ().地图
+
+地图.保存html(目标路径='.')
+
+```
+以上生成的html地图如下,可以看到有**高德地图**和**智图GeoQ**两个瓦片图层
+![img_1.png](img_1.png)
+
+
+
+---
 #### 参与贡献
 
 1. Fork 本仓库

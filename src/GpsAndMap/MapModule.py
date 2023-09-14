@@ -3000,8 +3000,8 @@ class 地图类:
                     控制层数量 += 1
         # endregion
 
-        # region 如果有控制需求,则添加控制层
-        if 控制层数量 > 0:
+        # region 如果有控制需求, 或者瓦片数量大于1, 则添加控制层以体现控制层信息和瓦片信息
+        if 控制层数量 > 0 or 瓦片数量 > 1:
             self.Map.add_child(_folium.LayerControl(collapsed=False if (控制层数量 + (瓦片数量 if 瓦片数量 > 1 else 0) < 10) else True,
                                                     autoZIndex=True))
         # endregion
