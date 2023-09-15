@@ -10,7 +10,11 @@ from math import radians as _radians
 from math import fabs as _fabs
 from math import sqrt as _sqrt
 from math import pi as _pi
+from math import tan as _tan
 from math import atan as _atan
+from math import atan2 as _atan2
+from math import log as _log
+from math import exp as _exp
 
 try:
     from DebugInfo.DebugInfo import 打印模板 as _打印模板
@@ -39,7 +43,8 @@ except ImportError as imErr:
 _axis: float = 6378245.0
 _offset: float = 0.00669342162296594323
 _x_pi: float = _pi * 3000.0 / 180.0
-_earthR: int = 6371000  # 6371393
+_earthR: int = 6378137  # 6371393
+_赤道周长: float = 2 * _pi * _earthR
 
 
 def _gcj2BD09(经度: float = 0, 纬度: float = 0) -> tuple[float, float]:
@@ -152,13 +157,61 @@ class GPS坐标系类型(_Enum):
     谷歌地图坐标 = 2
     GPS接收机坐标 = 2
 
+
 # endregion
+
+
+class 墨卡托坐标类:
+    """
+    墨卡托坐标与GPS坐标的换算算法,参考自: https://blog.csdn.net/qq_28918357/article/details/122939246
+    """
+    def __init__(self,
+                 x: float = None,
+                 y: float = None):
+        self.x: float = x
+        self.y: float = y
+
+    # region 访问器
+    @property
+    def 有效(self) -> bool:
+        if self.x is None or self.y is None:
+            return False
+        else:
+            return True
+
+    @property
+    def 无效(self) -> bool:
+        return not self.有效
+
+    # endregion
+
+    def 设置坐标(self, 坐标: 'GPS坐标类'):
+        """
+        将指定的GPS坐标类对象转换为墨卡托坐标值
+        """
+        self.x = None
+        self.y = None
+        if 坐标.有效:
+            self.x = 坐标.经度 * _赤道周长 / 360
+            self.y = _log(_tan((90 + 坐标.纬度) * _pi / 360)) * 0.5 * _赤道周长 / _pi
+
+    def GPS坐标(self, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> 'GPS坐标类':
+        """
+        将当前的墨卡托坐标值,转换为指定的GPS坐标系下的 GPS坐标类 对象
+        """
+        if self.无效:
+            return GPS坐标类(经度=0, 纬度=0, 坐标系=目标坐标系)
+
+        return GPS坐标类(经度=self.x * 360 / _赤道周长,
+                      纬度=_atan(_exp(self.y * _pi * 2 / _赤道周长)) * 360 / _pi - 90,
+                      坐标系=目标坐标系)
 
 
 class GPS坐标类:
     """
     定义了GPS坐标数据结构，您可以通过 GPS坐标类.帮助文档() 或者 GPS坐标类对象.帮助文档() 来打印相关的帮助信息
     """
+
     class __GPS坐标子类:
         def __init__(self,
                      经度: float = None,
@@ -232,6 +285,8 @@ class GPS坐标类:
         if self.__坐标系 == GPS坐标系类型.bd09:
             self.__bd09坐标.经度 = self.__经度
             self.__bd09坐标.纬度 = self.__纬度
+
+        self.__墨卡托坐标: 墨卡托坐标类 = 墨卡托坐标类()
 
     # region 访问器
     @property
@@ -332,6 +387,14 @@ class GPS坐标类:
                 return 0, 0
 
     @property
+    def 墨卡托坐标(self) -> 墨卡托坐标类:
+        if self.__墨卡托坐标.有效:
+            return self.__墨卡托坐标
+        else:
+            self.__墨卡托坐标.设置坐标(self)
+            return self.__墨卡托坐标 if self.__墨卡托坐标.有效 else 墨卡托坐标类(0, 0)
+
+    @property
     def 副本(self) -> 'GPS坐标类':
         副本: GPS坐标类 = GPS坐标类(经度=self.__经度, 纬度=self.__纬度, 坐标系=self.__坐标系)
 
@@ -340,6 +403,9 @@ class GPS坐标类:
     # endregion
 
     def 目标坐标(self, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> tuple[float, float]:
+        """
+        计算并返回当前坐标在指定坐标系下的坐标值
+        """
         if 目标坐标系 == GPS坐标系类型.gcj02:
             return self.gcj02坐标
         elif 目标坐标系 in [GPS坐标系类型.wgs84, GPS坐标系类型.智能推理坐标]:
@@ -398,6 +464,9 @@ class GPS坐标类:
             return self.__m
 
     def 球面距离(self, 目标点: 'GPS坐标类') -> __距离类:
+        """
+        计算本坐标点到指定坐标点之间的球面距离
+        """
         if type(目标点) in [GPS坐标类, GPS坐标类.__GPS坐标子类]:
             目标参考点: GPS坐标类 = GPS坐标类(目标点.经度, 目标点.纬度, 目标点.坐标系)
         else:
@@ -429,6 +498,66 @@ class GPS坐标类:
 
         return self.__距离类(2 * _earthR * _asin(_sqrt(h)))
 
+    def 墨卡托倾角deg(self, 目标点: 'GPS坐标类', 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> float:
+        """
+        计算本坐标点到指定坐标点之间在墨卡托投影平面下的倾角, 以本坐标点为基准, 以正东方为起点, 逆时针方向为正
+        """
+        if self.无效:
+            return 0
+
+        if type(目标点) in [GPS坐标类, GPS坐标类.__GPS坐标子类]:
+            目标参考点: GPS坐标类 = GPS坐标类(目标点.经度, 目标点.纬度, 目标点.坐标系)
+        else:
+            return 0
+        if 目标参考点.无效:
+            return 0
+
+        if 目标坐标系 == GPS坐标系类型.智能推理坐标:
+            目标坐标系 = self.坐标系
+
+        基点: 墨卡托坐标类 = GPS坐标类(经度=self.目标坐标(目标坐标系)[0],
+                            纬度=self.目标坐标(目标坐标系)[1],
+                            坐标系=目标坐标系).墨卡托坐标
+        目标点: 墨卡托坐标类 = GPS坐标类(经度=目标参考点.目标坐标(目标坐标系)[0],
+                             纬度=目标参考点.目标坐标(目标坐标系)[1],
+                             坐标系=目标坐标系).墨卡托坐标
+
+        if 基点.无效 or 目标点.无效:
+            return 0
+        倾角弧度值: float = _atan2(目标点.y - 基点.y, 目标点.x - 基点.x)
+        return 倾角弧度值 * 180 / _pi
+
+    def 墨卡托中点(self, 目标点: 'GPS坐标类', 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> 'GPS坐标类':
+        """
+        计算本坐标点到指定坐标点之间在墨卡托投影平面下, 连线中点位置的GPS坐标
+        """
+        if self.无效:
+            return self
+
+        if type(目标点) in [GPS坐标类, GPS坐标类.__GPS坐标子类]:
+            目标参考点: GPS坐标类 = GPS坐标类(目标点.经度, 目标点.纬度, 目标点.坐标系)
+        else:
+            return self
+        if 目标参考点.无效:
+            return self
+
+        if 目标坐标系 == GPS坐标系类型.智能推理坐标:
+            目标坐标系 = self.坐标系
+
+        基点: 墨卡托坐标类 = GPS坐标类(经度=self.目标坐标(目标坐标系)[0],
+                            纬度=self.目标坐标(目标坐标系)[1],
+                            坐标系=目标坐标系).墨卡托坐标
+        目标点: 墨卡托坐标类 = GPS坐标类(经度=目标参考点.目标坐标(目标坐标系)[0],
+                             纬度=目标参考点.目标坐标(目标坐标系)[1],
+                             坐标系=目标坐标系).墨卡托坐标
+        if 基点.无效 or 目标点.无效:
+            return self
+
+        中点: 墨卡托坐标类 = 墨卡托坐标类(x=(基点.x + 目标点.x) * 0.5,
+                            y=(基点.y + 目标点.y) * 0.5)
+
+        return 中点.GPS坐标(目标坐标系=目标坐标系)
+
     @staticmethod
     def 帮助文档(打印方法: callable = None) -> None:
         画板: _打印模板 = _打印模板()
@@ -457,6 +586,8 @@ class GPS坐标类:
             画板.添加一行('方法', '说明').修饰行(_青字)
         画板.添加一行('目标坐标:', '返回 指定坐标系 下的坐标值, tuple(经度, 纬度)')
         画板.添加一行('球面距离:', '返回 指定GPS坐标类对象位置 和当前GPS坐标对象位置之间的球面距离信息, 可引用m, km, inch, feet等单位')
+        画板.添加一行('墨卡托倾角deg:', '返回 指定GPS坐标类对象位置 和当前GPS坐标对象位置之间, 在墨卡托投影下连线的倾斜角度, 单位: 度')
+        画板.添加一行('墨卡托中点:', '返回 指定GPS坐标类对象位置 和当前GPS坐标对象位置之间, 在墨卡托投影下连线的中点位置处的GPS坐标类对象')
 
         画板.添加分隔行('=', None if callable(打印方法) else _黄字)
 
@@ -819,6 +950,8 @@ _常用坐标字典: dict = {'哈尔滨市': GPS坐标类(126.5350, 45.8020, GPS
                  '墨河市': GPS坐标类(122.5399, 52.9731, GPS坐标系类型.腾讯地图坐标),
                  '黑河市': GPS坐标类(127.5220, 50.2475, GPS坐标系类型.腾讯地图坐标)
                  }
+
+
 # endregion
 
 
@@ -3319,6 +3452,7 @@ class _常用坐标类:
             return _常用坐标字典['黑河市']
         else:
             return GPS坐标类()
+
     # endregion
     # endregion
 
