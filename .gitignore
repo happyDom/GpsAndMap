@@ -147,3 +147,7 @@ autoGitCommit.bat
 
 # 忽略百度云同步文件
 *baiduyun*
+
+# 忽略test路径下的 非必要 文档
+tests/*.html
+tests/src

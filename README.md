@@ -96,7 +96,7 @@ from GpsAndMap.GpsModule import *
 
 画板.添加多行(list(常用坐标.常用坐标字典.keys()), 拆分列数=8).展示表格()
 ```
-打印截图一角如下:
+打印截图一角如下:  
 ![img.png](img.png)
 ---
 ### GpsAndMap.MapModule 模块
@@ -110,7 +110,7 @@ from GpsAndMap.GpsModule import *
 
 👉**MapModule**模块支持添加坐标拾取,鼠标打点,鼠标绘图,蚂蚁路径等folium.plugins功能
 
-👉**MapModule**模块支持直接添加和使用12+种瓦片底图,包括google, 高德系列, 智图GeoQ系列
+👉**MapModule**模块支持直接添加和使用10+种瓦片底图,包括google, 高德系列, 智图GeoQ系列
 
 👇 以代码演示了如何向地图中添加指定的瓦片底图, 并将Map对象保存为html以供阅览
 ```python
@@ -129,6 +129,20 @@ from src.GpsAndMap.MapModule import *
 以上生成的html地图如下,可以看到有**高德地图**和**智图GeoQ**两个瓦片图层
 ![img_1.png](img_1.png)
 
+👇 以下代码添加了所有支持的瓦片图，可以看到当前总共支持直接添加13种不同的瓦片底图。
+```python
+# -*- coding:UTF-8 -*-
+
+# region 引入必要依赖
+from src.GpsAndMap.MapModule import *
+
+# endregion
+
+地图 = 地图类().添加瓦片.添加所有.地图
+
+地图.保存html(目标路径='.')
+```
+![img_2.png](img_2.png)
 
 
 ---
