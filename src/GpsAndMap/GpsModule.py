@@ -211,7 +211,6 @@ class GPS坐标类:
     """
     定义了GPS坐标数据结构，您可以通过 GPS坐标类.帮助文档() 或者 GPS坐标类对象.帮助文档() 来打印相关的帮助信息
     """
-
     class __GPS坐标子类:
         def __init__(self,
                      经度: float = None,
@@ -420,6 +419,7 @@ class GPS坐标类:
                      m: float = 0):
             self.__m: float = m
 
+        # region 访问器
         @property
         def km(self) -> float:
             return self.__m * 0.001
@@ -460,6 +460,8 @@ class GPS坐标类:
         def mi(self, 值: float):
             self.__m = 值 / 0.00062137119224
 
+        # endregion
+
         def __float__(self) -> float:
             return self.__m
 
@@ -498,65 +500,121 @@ class GPS坐标类:
 
         return self.__距离类(2 * _earthR * _asin(_sqrt(h)))
 
-    def 墨卡托倾角deg(self, 目标点: 'GPS坐标类', 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> float:
+    class __倾角类:
+        def __init__(self,
+                     起点: 'GPS坐标类' = None,
+                     终点: 'GPS坐标类' = None,
+                     坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标):
+            self.__起点: GPS坐标类 = 起点
+            self.__终点: GPS坐标类 = 终点
+            self.__坐标系: GPS坐标系类型 = 坐标系
+
+        # region 访问器
+        @property
+        def 有效(self) -> bool:
+            return isinstance(self.__起点, GPS坐标类) and self.__起点.有效 and isinstance(self.__终点, GPS坐标类) and self.__终点.有效
+
+        @property
+        def 无效(self) -> bool:
+            return not self.有效
+
+        @property
+        def 墨卡托倾角deg(self) -> float:
+            """
+            计算本坐标点到指定坐标点之间在墨卡托投影平面下的倾角, 以本坐标点为基准, 以正东方为起点, 逆时针方向为正
+            """
+            if self.无效:
+                return 0
+
+            if self.__坐标系 == GPS坐标系类型.智能推理坐标:
+                self.__坐标系 = self.__起点.坐标系
+
+            基点: 墨卡托坐标类 = GPS坐标类(经度=self.__起点.目标坐标(self.__坐标系)[0],
+                                纬度=self.__起点.目标坐标(self.__坐标系)[1],
+                                坐标系=self.__坐标系).墨卡托坐标
+            目标点: 墨卡托坐标类 = GPS坐标类(经度=self.__终点.目标坐标(self.__坐标系)[0],
+                                 纬度=self.__终点.目标坐标(self.__坐标系)[1],
+                                 坐标系=self.__坐标系).墨卡托坐标
+
+            if 基点.无效 or 目标点.无效:
+                return 0
+            倾角弧度值: float = _atan2(目标点.y - 基点.y, 目标点.x - 基点.x)
+            return 倾角弧度值 * 180 / _pi
+
+        @property
+        def __float__(self) -> float:
+            return self.墨卡托倾角deg
+
+        # endregion
+
+    def 倾角(self, 目标点: 'GPS坐标类', 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> __倾角类:
         """
-        计算本坐标点到指定坐标点之间在墨卡托投影平面下的倾角, 以本坐标点为基准, 以正东方为起点, 逆时针方向为正
+        计算本坐标点到指定坐标点之间的倾角, 以本坐标点为基准, 以正东方为起点, 逆时针方向为正
         """
-        if self.无效:
-            return 0
+        return self.__倾角类(起点=self,
+                          终点=目标点,
+                          坐标系=目标坐标系)
 
-        if type(目标点) in [GPS坐标类, GPS坐标类.__GPS坐标子类]:
-            目标参考点: GPS坐标类 = GPS坐标类(目标点.经度, 目标点.纬度, 目标点.坐标系)
-        else:
-            return 0
-        if 目标参考点.无效:
-            return 0
+    class __中点类:
+        def __init__(self,
+                     起点: 'GPS坐标类' = None,
+                     终点: 'GPS坐标类' = None,
+                     坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标):
+            self.__起点: GPS坐标类 = 起点
+            self.__终点: GPS坐标类 = 终点
+            self.__坐标系: GPS坐标系类型 = 坐标系
 
-        if 目标坐标系 == GPS坐标系类型.智能推理坐标:
-            目标坐标系 = self.坐标系
+        # region 访问器
+        @property
+        def 有效(self) -> bool:
+            return isinstance(self.__起点, GPS坐标类) and self.__起点.有效 and isinstance(self.__终点, GPS坐标类) and self.__终点.有效
 
-        基点: 墨卡托坐标类 = GPS坐标类(经度=self.目标坐标(目标坐标系)[0],
-                            纬度=self.目标坐标(目标坐标系)[1],
-                            坐标系=目标坐标系).墨卡托坐标
-        目标点: 墨卡托坐标类 = GPS坐标类(经度=目标参考点.目标坐标(目标坐标系)[0],
-                             纬度=目标参考点.目标坐标(目标坐标系)[1],
-                             坐标系=目标坐标系).墨卡托坐标
+        @property
+        def 无效(self) -> bool:
+            return not self.有效
 
-        if 基点.无效 or 目标点.无效:
-            return 0
-        倾角弧度值: float = _atan2(目标点.y - 基点.y, 目标点.x - 基点.x)
-        return 倾角弧度值 * 180 / _pi
+        @property
+        def 墨卡托中点(self) -> 'GPS坐标类':
+            """
+            计算本坐标点到指定坐标点之间在墨卡托投影平面下, 连线中点位置的GPS坐标
+            """
+            if self.无效:
+                if isinstance(self.__起点, GPS坐标类) and self.__起点.有效:
+                    return self.__起点
+                elif isinstance(self.__终点, GPS坐标类) and self.__终点.有效:
+                    return self.__终点
+                else:
+                    if isinstance(self.__坐标系, GPS坐标系类型):
+                        return GPS坐标类(0, 0, self.__坐标系)
+                    else:
+                        return GPS坐标类(0, 0, GPS坐标系类型.智能推理坐标)
 
-    def 墨卡托中点(self, 目标点: 'GPS坐标类', 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> 'GPS坐标类':
+            if self.__坐标系 == GPS坐标系类型.智能推理坐标:
+                self.__坐标系 = self.__起点.坐标系
+
+            基点: 墨卡托坐标类 = GPS坐标类(经度=self.__起点.目标坐标(self.__坐标系)[0],
+                                纬度=self.__起点.目标坐标(self.__坐标系)[1],
+                                坐标系=self.__坐标系).墨卡托坐标
+            目标点: 墨卡托坐标类 = GPS坐标类(经度=self.__终点.目标坐标(self.__坐标系)[0],
+                                 纬度=self.__终点.目标坐标(self.__坐标系)[1],
+                                 坐标系=self.__坐标系).墨卡托坐标
+            if 基点.无效 or 目标点.无效:
+                return self.__起点
+
+            中点: 墨卡托坐标类 = 墨卡托坐标类(x=(基点.x + 目标点.x) * 0.5,
+                                y=(基点.y + 目标点.y) * 0.5)
+
+            return 中点.GPS坐标(目标坐标系=self.__坐标系)
+
+        # endregion
+
+    def 墨卡托中点(self, 目标点: 'GPS坐标类', 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> __中点类:
         """
-        计算本坐标点到指定坐标点之间在墨卡托投影平面下, 连线中点位置的GPS坐标
+        计算本坐标点到指定坐标点之间, 中点位置的GPS坐标
         """
-        if self.无效:
-            return self
-
-        if type(目标点) in [GPS坐标类, GPS坐标类.__GPS坐标子类]:
-            目标参考点: GPS坐标类 = GPS坐标类(目标点.经度, 目标点.纬度, 目标点.坐标系)
-        else:
-            return self
-        if 目标参考点.无效:
-            return self
-
-        if 目标坐标系 == GPS坐标系类型.智能推理坐标:
-            目标坐标系 = self.坐标系
-
-        基点: 墨卡托坐标类 = GPS坐标类(经度=self.目标坐标(目标坐标系)[0],
-                            纬度=self.目标坐标(目标坐标系)[1],
-                            坐标系=目标坐标系).墨卡托坐标
-        目标点: 墨卡托坐标类 = GPS坐标类(经度=目标参考点.目标坐标(目标坐标系)[0],
-                             纬度=目标参考点.目标坐标(目标坐标系)[1],
-                             坐标系=目标坐标系).墨卡托坐标
-        if 基点.无效 or 目标点.无效:
-            return self
-
-        中点: 墨卡托坐标类 = 墨卡托坐标类(x=(基点.x + 目标点.x) * 0.5,
-                            y=(基点.y + 目标点.y) * 0.5)
-
-        return 中点.GPS坐标(目标坐标系=目标坐标系)
+        return self.__中点类(起点=self,
+                          终点=目标点,
+                          坐标系=目标坐标系)
 
     @staticmethod
     def 帮助文档(打印方法: callable = None) -> None:
