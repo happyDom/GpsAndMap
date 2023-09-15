@@ -18,6 +18,4 @@ from src.GpsAndMap.MapModule import *
 # 地图.保存html(目标路径='.').打开()
 
 坐标1 = GPS坐标类(0, 0, GPS坐标系类型.wgs84)
-坐标2 = GPS坐标类(0, 10, GPS坐标系类型.wgs84)
-
-print(坐标1.球面距离(坐标2).m)
+坐标2 = GPS坐标类(100, 10, GPS坐标系类型.wgs84)

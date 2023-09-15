@@ -8,8 +8,6 @@ from enum import unique as _unique
 from copy import deepcopy as _deepcopy
 from copy import copy as _copy
 from datetime import datetime as _datetime
-from math import pi as _pi
-from math import atan2 as _atan2
 import re as _re
 
 try:
@@ -1660,7 +1658,7 @@ class 折线类:
             终点位置: GPS坐标类 = self.路径点序列[路径点序号 + 1] if isinstance(self.路径点序列[路径点序号 + 1], GPS坐标类) else self.路径点序列[
                 路径点序号 + 1].位置
 
-            中点序列.append(_线段中点类(位置=起点位置.墨卡托中点(目标点=终点位置, 目标坐标系=目标坐标系).墨卡托中点,
+            中点序列.append(_线段中点类(位置=起点位置.中点(目标点=终点位置, 目标坐标系=目标坐标系).墨卡托中点,
                                倾角=起点位置.倾角(目标点=终点位置, 目标坐标系=目标坐标系).墨卡托倾角deg))
         return 中点序列
 
