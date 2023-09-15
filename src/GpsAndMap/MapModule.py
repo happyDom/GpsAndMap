@@ -1201,19 +1201,26 @@ class 蚂蚁路径标记类:
                               self.消息.副本,
                               self.提示.副本)
 
-    def 添加路径点(self, 路径点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '蚂蚁路径标记类':
+    def 添加路径点(self, 路径点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类 or list) -> '蚂蚁路径标记类':
         """
         将指定的坐标点添加到该蚂蚁路径类对象的路径点序列中来
-        :param 路径点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
+        :param 路径点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象, 或者以上对象的列表
         :return: self
         """
-        if type(路径点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 路径点 if isinstance(路径点, GPS坐标类) else 路径点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
-                位置.坐标系 = self.__GPS坐标系推理基准
-            else:
-                self.__GPS坐标系推理基准 = 位置.坐标系
-            self.路径点序列.append(路径点)
+        待添加路径点: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = []
+        if isinstance(路径点, list):
+            待添加路径点 = 路径点
+        else:
+            待添加路径点.append(路径点)
+
+        for 点 in 待添加路径点:
+            if type(点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+                位置 = 点 if isinstance(点, GPS坐标类) else 点.位置
+                if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                    位置.坐标系 = self.__GPS坐标系推理基准
+                else:
+                    self.__GPS坐标系推理基准 = 位置.坐标系
+                self.路径点序列.append(点)
         return self
 
     def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
@@ -1334,19 +1341,26 @@ class 矩形标记类:
                           self.消息.副本,
                           self.提示.副本)
 
-    def 添加角点(self, 角点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '矩形标记类':
+    def 添加角点(self, 角点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类 or list) -> '矩形标记类':
         """
         将指定的角点对象添加到该多矩形标记类对象的对角点序列中来
-        :param 角点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
+        :param 角点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象, 或者以上对象的列表
         :return: self
         """
-        if type(角点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 角点 if isinstance(角点, GPS坐标类) else 角点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
-                位置.坐标系 = self.__GPS坐标系推理基准
-            else:
-                self.__GPS坐标系推理基准 = 位置.坐标系
-            self.对角点序列.append(角点)
+        待添加角点: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = []
+        if isinstance(角点, list):
+            待添加角点 = 角点
+        else:
+            待添加角点.append(角点)
+
+        for 点 in 待添加角点:
+            if type(点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+                位置 = 点 if isinstance(点, GPS坐标类) else 点.位置
+                if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                    位置.坐标系 = self.__GPS坐标系推理基准
+                else:
+                    self.__GPS坐标系推理基准 = 位置.坐标系
+                self.对角点序列.append(点)
         return self
 
     def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
@@ -1438,12 +1452,12 @@ class 多边形标记类:
     """
 
     def __init__(self,
-                 路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
+                 角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  图形: 封闭图形样式类 = 封闭图形样式类(),
                  消息: 消息样式类 = 消息样式类(),
                  提示: 提示样式类 = 提示样式类(),
                  蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径标记类()):
-        self.路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 路径点序列 if isinstance(路径点序列, list) else []
+        self.角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 角点序列 if isinstance(角点序列, list) else []
         self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
         self.图形: 封闭图形样式类 = 图形 if isinstance(图形, 封闭图形样式类) else 封闭图形样式类()
         self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
@@ -1453,7 +1467,7 @@ class 多边形标记类:
     # region 访问器
     @property
     def 有效(self) -> bool:
-        return True if isinstance(self.路径点序列, list) and len(self.路径点序列) > 2 else False
+        return True if isinstance(self.角点序列, list) and len(self.角点序列) > 2 else False
 
     @property
     def 无效(self) -> bool:
@@ -1461,25 +1475,32 @@ class 多边形标记类:
 
     @property
     def 副本(self) -> '多边形标记类':
-        return 多边形标记类(_deepcopy(self.路径点序列),
+        return 多边形标记类(_deepcopy(self.角点序列),
                             self.图形.副本,
                             self.消息.副本,
                             self.提示.副本,
                             self.蚂蚁路径.副本)
 
-    def 添加角点(self, 角点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '多边形标记类':
+    def 添加角点(self, 角点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类 or list) -> '多边形标记类':
         """
         将指定的角点对象添加到该多边形标记类对象的角点序列中来
-        :param 角点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
+        :param 角点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象, 或者以上对象的列表
         :return: self
         """
-        if type(角点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 角点 if isinstance(角点, GPS坐标类) else 角点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
-                位置.坐标系 = self.__GPS坐标系推理基准
-            else:
-                self.__GPS坐标系推理基准 = 位置.坐标系
-            self.路径点序列.append(角点)
+        待添加角点: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = []
+        if isinstance(角点, list):
+            待添加角点 = 角点
+        else:
+            待添加角点.append(角点)
+
+        for 点 in 待添加角点:
+            if type(点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+                位置 = 点 if isinstance(点, GPS坐标类) else 点.位置
+                if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                    位置.坐标系 = self.__GPS坐标系推理基准
+                else:
+                    self.__GPS坐标系推理基准 = 位置.坐标系
+                self.角点序列.append(点)
         return self
 
     def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
@@ -1495,7 +1516,7 @@ class 多边形标记类:
 
                 # 生成路径点序列
                 纬经度坐标序列: list[list[float, float]] = []
-                for 路径点 in self.路径点序列:
+                for 路径点 in self.角点序列:
                     if isinstance(路径点, GPS坐标类) and 路径点.有效:
                         纬经度坐标序列.append(list(路径点.目标坐标(目标坐标系=目标坐标系))[::-1])
                     elif type(路径点) in [图标标记类, 圆圈标记类, 正多边形标记类] and 路径点.位置.有效:
@@ -1524,13 +1545,13 @@ class 多边形标记类:
                                 popup=self.消息._popup对象,
                                 tooltip=self.提示._toolTip对象).add_to(图层)
 
-                for 点坐标 in self.路径点序列:
+                for 点坐标 in self.角点序列:
                     if type(点坐标) in [图标标记类, 圆圈标记类, 正多边形标记类]:
                         点坐标._添加到图层(图层=图层, 目标坐标系=目标坐标系)
 
                 if self.蚂蚁路径.显示:
                     if not self.蚂蚁路径.路径点序列:
-                        self.蚂蚁路径.路径点序列 = self.路径点序列
+                        self.蚂蚁路径.路径点序列 = self.角点序列
                     if self.蚂蚁路径.有效:
                         self.蚂蚁路径._添加到图层(图层=图层, 目标坐标系=目标坐标系)
 
@@ -1677,19 +1698,26 @@ class 折线类:
             中点序列.append(中点)
         return 中点序列
 
-    def 添加路径点(self, 路径点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类) -> '折线类':
+    def 添加路径点(self, 路径点: GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类 or list) -> '折线类':
         """
         将指定的坐标点添加到该折线类对象的路径点序列中来
-        :param 路径点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象
+        :param 路径点: GPS坐标类对象, 图标标记类对象, 圆圈标记类对象, 正多边形标记类对象, 或者以上对象的列表
         :return: self
         """
-        if type(路径点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
-            位置 = 路径点 if isinstance(路径点, GPS坐标类) else 路径点.位置
-            if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
-                位置.坐标系 = self.__GPS坐标系推理基准
-            else:
-                self.__GPS坐标系推理基准 = 位置.坐标系
-            self.路径点序列.append(路径点)
+        待添加路径点: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = []
+        if isinstance(路径点, list):
+            待添加路径点 = 路径点
+        else:
+            待添加路径点.append(路径点)
+
+        for 点 in 待添加路径点:
+            if type(点) in [GPS坐标类, 图标标记类, 圆圈标记类, 正多边形标记类]:
+                位置 = 点 if isinstance(点, GPS坐标类) else 点.位置
+                if 位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                    位置.坐标系 = self.__GPS坐标系推理基准
+                else:
+                    self.__GPS坐标系推理基准 = 位置.坐标系
+                self.路径点序列.append(点)
         return self
 
     def _添加到图层(self, 图层: _folium.Map or _folium.FeatureGroup, 目标坐标系: GPS坐标系类型 = GPS坐标系类型.智能推理坐标) -> None:
@@ -1924,7 +1952,7 @@ class 参考线类:
         画板.展示表格(打印方法=打印方法)
 
 
-class 热力层类:
+class _热力层类:
     """
     定义了热力层的数据结构，您可以通过 热力层类.帮助文档() 或者 热力层类对象.帮助文档() 来打印相关的帮助信息
     """
@@ -1971,7 +1999,7 @@ class 热力层类:
 
     # endregion
 
-    def 添加热力点(self, 热力点: 热力点类 or GPS坐标类) -> '热力层类':
+    def 添加热力点(self, 热力点: 热力点类 or GPS坐标类) -> '_热力层类':
         """
         将指定的热力点类, 或者 GPS坐标类, 添加到热力图层中来
         :param 热力点:  热力点类对象, 或者 GPS坐标类对象
@@ -2244,7 +2272,7 @@ class 地图类:
 
         self.__参考线列表: list[参考线类] = []
 
-        self.__图层表: list[图层类 or 热力层类] = []
+        self.__图层表: list[图层类 or _热力层类] = []
 
         # 是否允许位置拾取
         self.__位置拾取: bool = False
@@ -2678,7 +2706,7 @@ class 地图类:
 
         if 可添加:
             # 如果图层可以添加, 则添加一个新的图层,并返回图层号
-            self.__图层表.append(热力层类(热力点序列=[],
+            self.__图层表.append(_热力层类(热力点序列=[],
                                           图层名称=图层名称,
                                           默认显示=默认显示,
                                           热力斑半径px=热力斑半径px,
@@ -2687,7 +2715,7 @@ class 地图类:
             return len(self.__图层表) - 1
         else:
             for 图层号 in range(len(self.__图层表)):
-                if self.__图层表[图层号].图层名称 == 图层名称 and isinstance(self.__图层表[图层号], 热力层类):
+                if self.__图层表[图层号].图层名称 == 图层名称 and isinstance(self.__图层表[图层号], _热力层类):
                     return 图层号
 
         # 如果以上努力均没有成果,则返回-1, 不指向任何图层
@@ -2740,7 +2768,7 @@ class 地图类:
         :param 热力点: GPS坐标对象, 或者是 热力点对象
         :return: self
         """
-        if 0 <= 图层号 < self.图层数量 and isinstance(self.__图层表[图层号], 热力层类):
+        if 0 <= 图层号 < self.图层数量 and isinstance(self.__图层表[图层号], _热力层类):
             待添加热力点: list[热力点类] = []
             if isinstance(热力点, 热力点类):
                 待添加热力点.append(热力点)
@@ -2790,7 +2818,7 @@ class 地图类:
                             标记.位置.坐标系 = self.__GPS坐标系推理基准
                         else:
                             self.__GPS坐标系推理基准 = 标记.位置.坐标系
-                    elif isinstance(标记, 折线类) or isinstance(标记, 多边形标记类) or isinstance(标记, 蚂蚁路径标记类):
+                    elif isinstance(标记, 折线类) or isinstance(标记, 蚂蚁路径标记类):
                         if 标记.路径点序列:
                             for 路径点 in 标记.路径点序列:
                                 if type(路径点) in [图标标记类, 圆圈标记类]:
@@ -2803,7 +2831,7 @@ class 地图类:
                                         路径点.坐标系 = self.__GPS坐标系推理基准
                                     else:
                                         self.__GPS坐标系推理基准 = 路径点.坐标系
-                        if isinstance(标记, 折线类) or isinstance(标记, 多边形标记类):
+                        if isinstance(标记, 折线类):
                             if 标记.蚂蚁路径.路径点序列:
                                 for 路径点 in 标记.蚂蚁路径.路径点序列:
                                     if type(路径点) in [图标标记类, 圆圈标记类]:
@@ -2816,6 +2844,31 @@ class 地图类:
                                             路径点.坐标系 = self.__GPS坐标系推理基准
                                         else:
                                             self.__GPS坐标系推理基准 = 路径点.坐标系
+                    elif isinstance(标记, 多边形标记类):
+                        if 标记.角点序列:
+                            for 角点 in 标记.角点序列:
+                                if type(角点) in [图标标记类, 圆圈标记类]:
+                                    if 角点.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                                        角点.位置.坐标系 = self.__GPS坐标系推理基准
+                                    else:
+                                        self.__GPS坐标系推理基准 = 角点.位置.坐标系
+                                elif isinstance(角点, GPS坐标类):
+                                    if 角点.坐标系 == GPS坐标系类型.智能推理坐标:
+                                        角点.坐标系 = self.__GPS坐标系推理基准
+                                    else:
+                                        self.__GPS坐标系推理基准 = 角点.坐标系
+                        if 标记.蚂蚁路径.路径点序列:
+                            for 角点 in 标记.蚂蚁路径.路径点序列:
+                                if type(角点) in [图标标记类, 圆圈标记类]:
+                                    if 角点.位置.坐标系 == GPS坐标系类型.智能推理坐标:
+                                        角点.位置.坐标系 = self.__GPS坐标系推理基准
+                                    else:
+                                        self.__GPS坐标系推理基准 = 角点.位置.坐标系
+                                elif isinstance(角点, GPS坐标类):
+                                    if 角点.坐标系 == GPS坐标系类型.智能推理坐标:
+                                        角点.坐标系 = self.__GPS坐标系推理基准
+                                    else:
+                                        self.__GPS坐标系推理基准 = 角点.坐标系
                     elif isinstance(标记, 矩形标记类):
                         for 角点 in 标记.对角点序列:
                             if type(角点) in [图标标记类, 圆圈标记类]:
@@ -2994,7 +3047,7 @@ class 地图类:
             for 图层 in self.__图层表:
                 if isinstance(图层, 图层类) and 图层.有效:
                     self.Map.add_child(图层._featureGroup对象(底图坐标系=self.底图坐标系))
-                elif isinstance(图层, 热力层类) and 图层.有效:
+                elif isinstance(图层, _热力层类) and 图层.有效:
                     图层._heatMap对象(底图坐标系=self.底图坐标系).add_to(self.Map)
                 if 图层.可控制:
                     控制层数量 += 1
