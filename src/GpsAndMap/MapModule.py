@@ -723,7 +723,7 @@ class 网页标题样式类:
         if 'font-color' not in self.文本属性字典.keys():
             if self.文本颜色:
                 文本颜色值: str = str(
-                        self.文本颜色.value if isinstance(self.文本颜色, 颜色名) else self.文本颜色).strip()
+                    self.文本颜色.value if isinstance(self.文本颜色, 颜色名) else self.文本颜色).strip()
                 if 文本颜色值:
                     self.文本属性字典['color'] = 文本颜色值
         if 'font-size' not in self.文本属性字典.keys():
@@ -792,19 +792,22 @@ class 图标标记类:
 
     def __init__(self,
                  位置: GPS坐标类 = GPS坐标类(),
-                 消息: 消息样式类 = 消息样式类(),
-                 图标: 图标样式类 = 图标样式类(),
-                 提示: 提示样式类 = 提示样式类()):
+                 消息: str or 消息样式类 = None,
+                 图标: str or 图标样式类 = None,
+                 提示: str or 提示样式类 = None):
         """
         folium.Marker 对象
         :param 位置: gps坐标
-        :param 消息: popup消息
+        :param 消息: str or 消息样式, 定义一个popup消息
         :param 图标: 图标样式
         """
         self.位置: GPS坐标类 = 位置
-        self.消息: 消息样式类 = 消息
-        self.图标: 图标样式类 = 图标
-        self.提示: 提示样式类 = 提示
+        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类(
+            消息=str(消息).strip() if 消息 else None)
+        self.图标: 图标样式类 = 图标 if isinstance(图标, 图标样式类) else 图标样式类(
+            名称=str(图标).strip() if 图标 else None)
+        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类(
+            消息=str(提示).strip() if 提示 else None)
 
     # region 访问器
     @property
@@ -879,15 +882,17 @@ class 圆圈标记类:
                  位置: GPS坐标类 = GPS坐标类(),
                  半径m: int = 0,
                  半径px: int = 0,
-                 消息: 消息样式类 = 消息样式类(),
+                 消息: str or 消息样式类 = None,
                  圆圈: 封闭图形样式类 = 封闭图形样式类(),
-                 提示: 提示样式类 = 提示样式类()):
+                 提示: str or 提示样式类 = None):
         self.位置: GPS坐标类 = 位置
         self.半径m: int = 半径m
         self.半径px: int = 半径px
-        self.消息: 消息样式类 = 消息
+        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类(
+            消息=str(消息).strip() if 消息 else None)
         self.圆圈: 封闭图形样式类 = 圆圈
-        self.提示: 提示样式类 = 提示
+        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类(
+            消息=str(提示).strip() if 提示 else None)
 
     # region 访问器
     @property
@@ -1005,15 +1010,17 @@ class 正多边形标记类:
                  半径px: int = 0,
                  角度deg: int or float = 0.0,
                  图形: 封闭图形样式类 = 封闭图形样式类(),
-                 消息: 消息样式类 = 消息样式类(),
-                 提示: 提示样式类 = 提示样式类()):
+                 消息: str or 消息样式类 = None,
+                 提示: str or 提示样式类 = None):
         self.位置: GPS坐标类 or 图标标记类 = 位置 if 位置 is not None else GPS坐标类()
         self.边数: int = 边数
         self.半径px: int = 半径px
         self.角度deg: int or float = 角度deg
         self.图形: 封闭图形样式类 = 图形
-        self.消息: 消息样式类 = 消息
-        self.提示: 提示样式类 = 提示
+        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类(
+            消息=str(消息).strip() if 消息 else None)
+        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类(
+            消息=str(提示).strip() if 提示 else None)
 
     # region 访问器
     @property
@@ -1125,8 +1132,8 @@ class 蚂蚁路径标记类:
                  间断色: list[str or 颜色名] = None,
                  透明度: float = 0.5,
                  间断长度px: list[int] = None,
-                 消息: 消息样式类 = 消息样式类(),
-                 提示: 提示样式类 = 提示样式类(),
+                 消息: str or 消息样式类 = None,
+                 提示: str or 提示样式类 = None,
                  ):
         self.路径点序列: list[
             GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = [] if 路径点序列 is None else 路径点序列
@@ -1139,8 +1146,10 @@ class 蚂蚁路径标记类:
         self.__间断色: list[str or 颜色名] = 间断色
         self.__间断长度px: list[int] = 间断长度px
         self.__GPS坐标系推理基准: GPS坐标系类型 = GPS坐标系类型.wgs84
-        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
-        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
+        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类(
+            消息=str(消息).strip() if 消息 else None)
+        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类(
+            消息=str(提示).strip() if 提示 else None)
 
     # region 访问器
     @property
@@ -1340,13 +1349,15 @@ class 矩形标记类:
     def __init__(self,
                  对角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  图形: 封闭图形样式类 = 封闭图形样式类(),
-                 消息: 消息样式类 = 消息样式类(),
-                 提示: 提示样式类 = 提示样式类()):
+                 消息: str or 消息样式类 = None,
+                 提示: str or 提示样式类 = None):
         self.对角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 对角点序列 if isinstance(
-                对角点序列, list) else []
-        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
+            对角点序列, list) else []
+        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类(
+            消息=str(消息).strip() if 消息 else None)
         self.图形: 封闭图形样式类 = 图形 if isinstance(图形, 封闭图形样式类) else 封闭图形样式类()
-        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
+        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类(
+            消息=str(提示).strip() if 提示 else None)
         self.__GPS坐标系推理基准: GPS坐标系类型 = GPS坐标系类型.wgs84
 
     # region 访问器
@@ -1481,14 +1492,16 @@ class 多边形标记类:
     def __init__(self,
                  角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  图形: 封闭图形样式类 = 封闭图形样式类(),
-                 消息: 消息样式类 = 消息样式类(),
-                 提示: 提示样式类 = 提示样式类(),
+                 消息: str or 消息样式类 = None,
+                 提示: str or 提示样式类 = None,
                  蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径标记类()):
         self.角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 角点序列 if isinstance(角点序列,
                                                                                                               list) else []
-        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
+        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类(
+            消息=str(消息).strip() if 消息 else None)
         self.图形: 封闭图形样式类 = 图形 if isinstance(图形, 封闭图形样式类) else 封闭图形样式类()
-        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
+        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类(
+            消息=str(提示).strip() if 提示 else None)
         self.蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径 if isinstance(蚂蚁路径, 蚂蚁路径标记类) else 蚂蚁路径标记类()
         self.__GPS坐标系推理基准: GPS坐标系类型 = GPS坐标系类型.wgs84
 
@@ -1632,17 +1645,19 @@ class 折线类:
     def __init__(self,
                  点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = None,
                  显示转移方向: bool = False,
-                 消息: 消息样式类 = 消息样式类(),
+                 消息: str or 消息样式类 = None,
                  线条样式: 线条样式类 = 线条样式类(),
-                 提示: 提示样式类 = 提示样式类(),
+                 提示: str or 提示样式类 = None,
                  线上文本样式: 线上文本样式类 = 线上文本样式类(),
                  蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径标记类()):
         self.路径点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 点序列 if isinstance(点序列,
                                                                                                               list) else []
         self.显示转移方向: bool = 显示转移方向
-        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
+        self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类(
+            消息=str(消息).strip() if 消息 else None)
         self.线条样式: 线条样式类 = 线条样式 if isinstance(线条样式, 线条样式类) else 线条样式类()
-        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
+        self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类(
+            消息=str(提示).strip() if 提示 else None)
         self.线上文本样式: 线上文本样式类 = 线上文本样式 if isinstance(线上文本样式,
                                                                        线上文本样式类) else 线上文本样式类()
         self.蚂蚁路径: 蚂蚁路径标记类 = 蚂蚁路径 if isinstance(蚂蚁路径, 蚂蚁路径标记类) else 蚂蚁路径标记类()
@@ -1754,12 +1769,12 @@ class 折线类:
 
                 # 生成一个 PloyLine 对象, 并将其添加到图层上
                 折线 = _folium.PolyLine(
-                        locations=纬经度坐标序列,
-                        color=self.线条样式.颜色,
-                        weight=self.线条样式.宽度,
-                        opacity=self.线条样式.透明度,
-                        popup=self.消息._popup对象,
-                        tooltip=self.提示._toolTip对象).add_to(图层)
+                    locations=纬经度坐标序列,
+                    color=self.线条样式.颜色,
+                    weight=self.线条样式.宽度,
+                    opacity=self.线条样式.透明度,
+                    popup=self.消息._popup对象,
+                    tooltip=self.提示._toolTip对象).add_to(图层)
 
                 # 如果需要标记线上文本, 则标记之
                 if self.线上文本样式.有效:
@@ -1898,13 +1913,13 @@ class 参考线类:
                     参考线端点1 = GPS坐标类(-720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
                     参考线端点2 = GPS坐标类(720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
                     线上文本 = ' ' * 5 + (
-                            f'{"北纬" if 参考线端点1.纬度 > 0 else "南纬"}: {abs(参考线端点1.纬度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
+                        f'{"北纬" if 参考线端点1.纬度 > 0 else "南纬"}: {abs(参考线端点1.纬度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
                 else:
                     # 暂不支持倾斜的参考线,如果有倾斜角度的,一律处理成经线
                     参考线端点1 = GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], -90, 目标坐标系)
                     参考线端点2 = GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], 90, 目标坐标系)
                     线上文本 = ' ' * 5 + (
-                            f'{"东经" if 参考线端点1.经度 > 0 else "西经"}: {abs(参考线端点1.经度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
+                        f'{"东经" if 参考线端点1.经度 > 0 else "西经"}: {abs(参考线端点1.经度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
 
                 # 完善参考线设置
                 线上文本样式.文本 = 线上文本
@@ -2513,9 +2528,9 @@ class 地图类:
         :return:_添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='OpenStreetMap',
-                瓦片属性="",
-                瓦片名称=瓦片名称)
+            瓦片链接='OpenStreetMap',
+            瓦片属性="",
+            瓦片名称=瓦片名称)
 
     def __添加StamenToner瓦片(self, 瓦片名称: str = 'Stamen Toner') -> _添加瓦片工具箱类:
         """
@@ -2524,9 +2539,9 @@ class 地图类:
         :return:_添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='Stamen Toner',
-                瓦片属性="",
-                瓦片名称=瓦片名称)
+            瓦片链接='Stamen Toner',
+            瓦片属性="",
+            瓦片名称=瓦片名称)
 
     def __添加高德地图瓦片(self, 瓦片名称: str = '高德地图') -> _添加瓦片工具箱类:
         """
@@ -2535,10 +2550,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7',
-                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7',
+            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加高德中英地图瓦片(self, 瓦片名称: str = '高德中英地图') -> _添加瓦片工具箱类:
         """
@@ -2547,10 +2562,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='https://webrd02.is.autonavi.com/appmaptile?lang=zh_en&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片链接='https://webrd02.is.autonavi.com/appmaptile?lang=zh_en&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加高德路网地图瓦片(self, 瓦片名称: str = '高德路网地图') -> _添加瓦片工具箱类:
         """
@@ -2559,10 +2574,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8&ltype=11',
-                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8&ltype=11',
+            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加高德卫星地图瓦片(self, 瓦片名称: str = '高德卫星地图') -> _添加瓦片工具箱类:
         """
@@ -2571,10 +2586,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='http://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.高德地图坐标)
+            瓦片链接='http://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加智图GeoQ瓦片(self, 瓦片名称: str = '智图GeoQ') -> _添加瓦片工具箱类:
         """
@@ -2583,10 +2598,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ灰色版瓦片(self, 瓦片名称: str = '智图GeoQ灰色版') -> _添加瓦片工具箱类:
         """
@@ -2595,10 +2610,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ中国行政区划边界瓦片(self, 瓦片名称: str = '智图GeoQ中国行政区划边界') -> _添加瓦片工具箱类:
         """
@@ -2607,10 +2622,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/administrative_division_boundaryandlabel/MapServer/tile/{z}/{y}/{x}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/administrative_division_boundaryandlabel/MapServer/tile/{z}/{y}/{x}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ中国水系瓦片(self, 瓦片名称: str = '智图GeoQ中国水系') -> _添加瓦片工具箱类:
         """
@@ -2619,10 +2634,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/WorldHydroMap/MapServer/tile/{z}/{y}/{x}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/WorldHydroMap/MapServer/tile/{z}/{y}/{x}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ灰度路网瓦片(self, 瓦片名称: str = '智图GeoQ灰度路网') -> _添加瓦片工具箱类:
         """
@@ -2631,10 +2646,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Gray_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Gray_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ暖色路网瓦片(self, 瓦片名称: str = '智图GeoQ暖色路网') -> _添加瓦片工具箱类:
         """
@@ -2643,10 +2658,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Warm_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
-                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.gcj02)
+            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Warm_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
+            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加腾讯瓦片(self, 瓦片名称: str = '腾讯地图') -> _添加瓦片工具箱类:
         """
@@ -2655,10 +2670,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-                瓦片链接='https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={-y}',
-                瓦片属性="&copy; <a target='_blank' href=https://map.qq.com/m/index/map>腾讯地图</a>",
-                瓦片名称=瓦片名称,
-                瓦片坐标系=GPS坐标系类型.腾讯地图坐标)
+            瓦片链接='https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={-y}',
+            瓦片属性="&copy; <a target='_blank' href=https://map.qq.com/m/index/map>腾讯地图</a>",
+            瓦片名称=瓦片名称,
+            瓦片坐标系=GPS坐标系类型.腾讯地图坐标)
 
     # endregion
 
@@ -3101,9 +3116,9 @@ class 地图类:
         # region 如果有控制需求, 或者瓦片数量大于1, 则添加控制层以体现控制层信息和瓦片信息
         if 控制层数量 > 0 or 瓦片数量 > 1:
             self.Map.add_child(
-                    _folium.LayerControl(
-                            collapsed=False if (控制层数量 + (瓦片数量 if 瓦片数量 > 1 else 0) < 10) else True,
-                            autoZIndex=True))
+                _folium.LayerControl(
+                    collapsed=False if (控制层数量 + (瓦片数量 if 瓦片数量 > 1 else 0) < 10) else True,
+                    autoZIndex=True))
         # endregion
 
         return self.Map
