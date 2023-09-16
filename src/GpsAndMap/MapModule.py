@@ -292,7 +292,8 @@ class 提示样式类:
 
     @property
     def _toolTip对象(self) -> _folium.Tooltip:
-        return None if self.无效 else _folium.Tooltip(text=str(self.消息).strip(), style=str(self.样式).strip(),
+        return None if self.无效 else _folium.Tooltip(text=str(self.消息).strip(),
+                                                      style=str(self.样式).strip(),
                                                       sticky=self.粘性)
 
     # endregion
@@ -722,7 +723,7 @@ class 网页标题样式类:
         if 'font-color' not in self.文本属性字典.keys():
             if self.文本颜色:
                 文本颜色值: str = str(
-                    self.文本颜色.value if isinstance(self.文本颜色, 颜色名) else self.文本颜色).strip()
+                        self.文本颜色.value if isinstance(self.文本颜色, 颜色名) else self.文本颜色).strip()
                 if 文本颜色值:
                     self.文本属性字典['color'] = 文本颜色值
         if 'font-size' not in self.文本属性字典.keys():
@@ -1342,7 +1343,7 @@ class 矩形标记类:
                  消息: 消息样式类 = 消息样式类(),
                  提示: 提示样式类 = 提示样式类()):
         self.对角点序列: list[GPS坐标类 or 图标标记类 or 圆圈标记类 or 正多边形标记类] = 对角点序列 if isinstance(
-            对角点序列, list) else []
+                对角点序列, list) else []
         self.消息: 消息样式类 = 消息 if isinstance(消息, 消息样式类) else 消息样式类()
         self.图形: 封闭图形样式类 = 图形 if isinstance(图形, 封闭图形样式类) else 封闭图形样式类()
         self.提示: 提示样式类 = 提示 if isinstance(提示, 提示样式类) else 提示样式类()
@@ -1689,7 +1690,7 @@ class 折线类:
         中点序列: list[_线段中点类] = []
         for 路径点序号 in range(len(self.路径点序列) - 1):
             起点位置: GPS坐标类 = self.路径点序列[路径点序号] if isinstance(self.路径点序列[路径点序号], GPS坐标类) else \
-            self.路径点序列[路径点序号].位置
+                self.路径点序列[路径点序号].位置
             终点位置: GPS坐标类 = self.路径点序列[路径点序号 + 1] if isinstance(self.路径点序列[路径点序号 + 1],
                                                                                 GPS坐标类) else self.路径点序列[
                 路径点序号 + 1].位置
@@ -1753,12 +1754,12 @@ class 折线类:
 
                 # 生成一个 PloyLine 对象, 并将其添加到图层上
                 折线 = _folium.PolyLine(
-                    locations=纬经度坐标序列,
-                    color=self.线条样式.颜色,
-                    weight=self.线条样式.宽度,
-                    opacity=self.线条样式.透明度,
-                    popup=self.消息._popup对象,
-                    tooltip=self.提示._toolTip对象).add_to(图层)
+                        locations=纬经度坐标序列,
+                        color=self.线条样式.颜色,
+                        weight=self.线条样式.宽度,
+                        opacity=self.线条样式.透明度,
+                        popup=self.消息._popup对象,
+                        tooltip=self.提示._toolTip对象).add_to(图层)
 
                 # 如果需要标记线上文本, 则标记之
                 if self.线上文本样式.有效:
@@ -1897,13 +1898,13 @@ class 参考线类:
                     参考线端点1 = GPS坐标类(-720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
                     参考线端点2 = GPS坐标类(720, self.参考点.目标坐标(目标坐标系)[1], 目标坐标系)
                     线上文本 = ' ' * 5 + (
-                        f'{"北纬" if 参考线端点1.纬度 > 0 else "南纬"}: {abs(参考线端点1.纬度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
+                            f'{"北纬" if 参考线端点1.纬度 > 0 else "南纬"}: {abs(参考线端点1.纬度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
                 else:
                     # 暂不支持倾斜的参考线,如果有倾斜角度的,一律处理成经线
                     参考线端点1 = GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], -90, 目标坐标系)
                     参考线端点2 = GPS坐标类(self.参考点.目标坐标(目标坐标系)[0], 90, 目标坐标系)
                     线上文本 = ' ' * 5 + (
-                        f'{"东经" if 参考线端点1.经度 > 0 else "西经"}: {abs(参考线端点1.经度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
+                            f'{"东经" if 参考线端点1.经度 > 0 else "西经"}: {abs(参考线端点1.经度)}' if not self.参考消息 else self.参考消息).strip() + ' ' * 5
 
                 # 完善参考线设置
                 线上文本样式.文本 = 线上文本
@@ -2387,27 +2388,27 @@ class 地图类:
 
     @property
     def 允许资源置换(self) -> '地图类':
-        资源置换表: dict[str, str] = {r'src="https.*/jquery.*.min.js"': r'src="./src/jQuery/jquery-2.0.0.js"',
-                                      r'src="https.*/leaflet.js"': r'src="./src/leaflet/leaflet.js"',
-                                      r'src="https.*/bootstrap.min.js"': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"',
-                                      r'src="https.*/leaflet.awesome-markers.js"': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"',
-                                      r'src="https.*/leaflet.markercluster.js"': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"',
-                                      r'src="https.*/leaflet-dvf.markers.min.js"': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"',
-                                      r'src="https.*/dist/js/bootstrap.bundle.min.js"': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"',
-                                      r'src="https.*/dist/leaflet-measure.min.js"': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"',
-                                      r'src="https.*/leaflet.textpath.min.js"': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"',
-                                      r'src="https.*/templates/leaflet_heat.min.js"': r'src="./src/leaflet/leaflet_heat.min.js"',
-                                      r'src="https.*/dist/leaflet-ant-path.min.js"': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"',
-                                      r'href="https.*/dist/leaflet.css"': r'href="./src/leaflet/leaflet.css"',
-                                      r'href="https.*/bootstrap.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"',
-                                      r'href="https.*/bootstrap-theme.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"',
-                                      r'href="https.*/css/font-awesome.min.css"': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"',
-                                      r'href="https.*/leaflet.awesome-markers.css"': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"',
+        资源置换表: dict[str, str] = {r'src="https.*/jquery.*.min.js"'                 : r'src="./src/jQuery/jquery-2.0.0.js"',
+                                      r'src="https.*/leaflet.js"'                      : r'src="./src/leaflet/leaflet.js"',
+                                      r'src="https.*/bootstrap.min.js"'                : r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"',
+                                      r'src="https.*/leaflet.awesome-markers.js"'      : r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"',
+                                      r'src="https.*/leaflet.markercluster.js"'        : r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"',
+                                      r'src="https.*/leaflet-dvf.markers.min.js"'      : r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"',
+                                      r'src="https.*/dist/js/bootstrap.bundle.min.js"' : r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"',
+                                      r'src="https.*/dist/leaflet-measure.min.js"'     : r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"',
+                                      r'src="https.*/leaflet.textpath.min.js"'         : r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"',
+                                      r'src="https.*/templates/leaflet_heat.min.js"'   : r'src="./src/leaflet/leaflet_heat.min.js"',
+                                      r'src="https.*/dist/leaflet-ant-path.min.js"'    : r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"',
+                                      r'href="https.*/dist/leaflet.css"'               : r'href="./src/leaflet/leaflet.css"',
+                                      r'href="https.*/bootstrap.min.css"'              : r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"',
+                                      r'href="https.*/bootstrap-theme.min.css"'        : r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"',
+                                      r'href="https.*/css/font-awesome.min.css"'       : r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"',
+                                      r'href="https.*/leaflet.awesome-markers.css"'    : r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"',
                                       r'href="https:.*/leaflet.awesome.rotate.min.css"': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"',
-                                      r'href="https.*/MarkerCluster.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"',
-                                      r'href="https.*/MarkerCluster.Default.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"',
-                                      r'href="https.*/fontawesome.*/css/all.min.css"': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"',
-                                      r'href="https.*/dist/leaflet-measure.min.css"': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'
+                                      r'href="https.*/MarkerCluster.css"'              : r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"',
+                                      r'href="https.*/MarkerCluster.Default.css"'      : r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"',
+                                      r'href="https.*/fontawesome.*/css/all.min.css"'  : r'href="./src/fontawesome-free-6.2.0/css/all.min.css"',
+                                      r'href="https.*/dist/leaflet-measure.min.css"'   : r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'
                                       }
 
         if not 资源置换表:
@@ -2512,9 +2513,9 @@ class 地图类:
         :return:_添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='OpenStreetMap',
-            瓦片属性="",
-            瓦片名称=瓦片名称)
+                瓦片链接='OpenStreetMap',
+                瓦片属性="",
+                瓦片名称=瓦片名称)
 
     def __添加StamenToner瓦片(self, 瓦片名称: str = 'Stamen Toner') -> _添加瓦片工具箱类:
         """
@@ -2523,9 +2524,9 @@ class 地图类:
         :return:_添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='Stamen Toner',
-            瓦片属性="",
-            瓦片名称=瓦片名称)
+                瓦片链接='Stamen Toner',
+                瓦片属性="",
+                瓦片名称=瓦片名称)
 
     def __添加高德地图瓦片(self, 瓦片名称: str = '高德地图') -> _添加瓦片工具箱类:
         """
@@ -2534,10 +2535,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7',
-            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+                瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=7',
+                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加高德中英地图瓦片(self, 瓦片名称: str = '高德中英地图') -> _添加瓦片工具箱类:
         """
@@ -2546,10 +2547,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='https://webrd02.is.autonavi.com/appmaptile?lang=zh_en&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+                瓦片链接='https://webrd02.is.autonavi.com/appmaptile?lang=zh_en&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加高德路网地图瓦片(self, 瓦片名称: str = '高德路网地图') -> _添加瓦片工具箱类:
         """
@@ -2558,10 +2559,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8&ltype=11',
-            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+                瓦片链接='https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8&ltype=11',
+                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加高德卫星地图瓦片(self, 瓦片名称: str = '高德卫星地图') -> _添加瓦片工具箱类:
         """
@@ -2570,10 +2571,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='http://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.高德地图坐标)
+                瓦片链接='http://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.amap.com>高德地图</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.高德地图坐标)
 
     def __添加智图GeoQ瓦片(self, 瓦片名称: str = '智图GeoQ') -> _添加瓦片工具箱类:
         """
@@ -2582,10 +2583,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+                瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ灰色版瓦片(self, 瓦片名称: str = '智图GeoQ灰色版') -> _添加瓦片工具箱类:
         """
@@ -2594,10 +2595,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+                瓦片链接='http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetGray/MapServer/tile/{z}/{y}/{x}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ中国行政区划边界瓦片(self, 瓦片名称: str = '智图GeoQ中国行政区划边界') -> _添加瓦片工具箱类:
         """
@@ -2606,10 +2607,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/administrative_division_boundaryandlabel/MapServer/tile/{z}/{y}/{x}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/administrative_division_boundaryandlabel/MapServer/tile/{z}/{y}/{x}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ中国水系瓦片(self, 瓦片名称: str = '智图GeoQ中国水系') -> _添加瓦片工具箱类:
         """
@@ -2618,10 +2619,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/WorldHydroMap/MapServer/tile/{z}/{y}/{x}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/ThematicMaps/WorldHydroMap/MapServer/tile/{z}/{y}/{x}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ灰度路网瓦片(self, 瓦片名称: str = '智图GeoQ灰度路网') -> _添加瓦片工具箱类:
         """
@@ -2630,10 +2631,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Gray_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Gray_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加智图GeoQ暖色路网瓦片(self, 瓦片名称: str = '智图GeoQ暖色路网') -> _添加瓦片工具箱类:
         """
@@ -2642,10 +2643,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Warm_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
-            瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.gcj02)
+                瓦片链接='http://thematic.geoq.cn/arcgis/rest/services/StreetThematicMaps/Warm_OnlySymbol/MapServer/tile/{z}/{y}/{x}',
+                瓦片属性="&copy; <a target='_blank' href=https://www.geoq.cn>智图GeoQ</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.gcj02)
 
     def __添加腾讯瓦片(self, 瓦片名称: str = '腾讯地图') -> _添加瓦片工具箱类:
         """
@@ -2654,10 +2655,10 @@ class 地图类:
         :return: _添加瓦片工具箱类
         """
         return self.__添加地图瓦片(
-            瓦片链接='https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={-y}',
-            瓦片属性="&copy; <a target='_blank' href=https://map.qq.com/m/index/map>腾讯地图</a>",
-            瓦片名称=瓦片名称,
-            瓦片坐标系=GPS坐标系类型.腾讯地图坐标)
+                瓦片链接='https://rt0.map.gtimg.com/tile?z={z}&x={x}&y={-y}',
+                瓦片属性="&copy; <a target='_blank' href=https://map.qq.com/m/index/map>腾讯地图</a>",
+                瓦片名称=瓦片名称,
+                瓦片坐标系=GPS坐标系类型.腾讯地图坐标)
 
     # endregion
 
@@ -2972,22 +2973,54 @@ class 地图类:
         # 再添加纬线
         self.添加参考纬线(参考点=参考点, 参考消息=参考消息, 线条样式=线条样式)
 
-    def 添加网页标题(self, 标题样式: 网页标题样式类) -> '地图类':
+    def 添加网页标题(self,
+                     标题样式或者文本: 网页标题样式类 or str = None,
+                     标题级别: int = None,
+                     文本尺寸px: int = None,
+                     文本颜色: str or 颜色名 = None,
+                     文本对齐: str = None,
+                     文本字体: str = None,
+                     文本属性字典: dict = None
+                     ) -> '地图类':
         """
-        向生成的html文档中添加html标题元素
-        :param 标题样式: 指定需要添加的网页表格的样式
-        :return: self
+        向地图中添加一行 html h1/h2/h3/h4/h5 元素作为标题,这个标题将独站一行显示于地图内容的上方
+        @param 标题样式或者文本: 网页标题样式类 对象,或者直接是标题文本
+        @param 标题级别: 用于定义标题的级别, 1~5
+        @param 文本尺寸px: 用于定义标题的字体尺寸
+        @param 文本颜色: 用于定义标题的字体颜色
+        @param 文本对齐: 用于定义标题的文本对齐方式
+        @param 文本字体: 用于定义标题的字体
+        @param 文本属性字典: 一个字典, 用于定义标题的属性及对应值
+        @return: self
         """
-        if isinstance(标题样式, 网页标题样式类):
-            if 标题样式.有效:
-                self.__网页标题.append(标题样式)
+        这个标题: 网页标题样式类
+        if isinstance(标题样式或者文本, 网页标题样式类):
+            这个标题 = 标题样式或者文本
+        else:
+            这个标题 = 网页标题样式类(标题文本=str(标题样式或者文本).strip())
+
+        if type(标题级别) in [int, float] and 0 < 标题级别 <= 5:
+            这个标题.标题级别 = 标题级别
+        if isinstance(文本尺寸px, int):
+            这个标题.文本尺寸px = 文本尺寸px
+        if type(文本颜色) in [str, 颜色名]:
+            这个标题.文本颜色 = 文本颜色
+        if str(文本对齐) in 'lcr':
+            这个标题.文本对齐 = str(文本对齐)[0]
+        if 文本字体:
+            这个标题.文本字体 = str(文本字体).strip()
+        if isinstance(文本属性字典, dict):
+            这个标题.文本属性字典 = 文本属性字典
+
+        self.__网页标题.append(这个标题)
         return self
 
-    def 生成Map对象(self, 画板: _打印模板 = None) -> _folium.Map:
+    def 生成Map对象(self,
+                    画板: _打印模板 = None) -> _folium.Map:
         """
-        处理 地图对象 中的数据,整理生成 folium.Map 对象
-        :param 画板: 调试模板对象, 用于输出控制台消息
-        :return: folium.Map
+        处理地图对象中的数据,整理生成folium.Map对象
+        @param 画板: 调试模板对象,用于输出控制台消息
+        @return: folium.Map
         """
         画板 = 画板 if 画板 else _打印模板()
         画板.执行位置(self.生成Map对象)
@@ -3068,8 +3101,9 @@ class 地图类:
         # region 如果有控制需求, 或者瓦片数量大于1, 则添加控制层以体现控制层信息和瓦片信息
         if 控制层数量 > 0 or 瓦片数量 > 1:
             self.Map.add_child(
-                _folium.LayerControl(collapsed=False if (控制层数量 + (瓦片数量 if 瓦片数量 > 1 else 0) < 10) else True,
-                                     autoZIndex=True))
+                    _folium.LayerControl(
+                            collapsed=False if (控制层数量 + (瓦片数量 if 瓦片数量 > 1 else 0) < 10) else True,
+                            autoZIndex=True))
         # endregion
 
         return self.Map
