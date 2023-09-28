@@ -62,8 +62,88 @@ except ImportError as imErr:
             print('再次尝试导入 DebugInfo 时遇到异常:', exp1)
             raise exp1
 
-
 # endregion
+
+# 指定 js/css 资源的网络地址
+_网络资源字典: dict = {r'cdn.jsdelivr.net': {'isReg': False, 'isDelet': False, 'tgtStr': r'fastly.jsdelivr.net'},
+                 r'https.*/jquery.*.min.js': {'isReg': True, 'isDelet': False, 'tgtStr': r'https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js'},
+                 r'netdna.bootstrapcdn.com': {'isReg': False, 'isDelet': True, 'tgtStr': r'fastly.jsdelivr.net'}}
+
+
+def _更新网络资源字典(字典: dict, 清空旧配置: bool = False) -> int:
+    """
+    使用指定的字典更新 _网络资源字典 中的配置,返回更新的配置项数
+    :param 字典: 以字典方式定义的配置参数{资源项目/名称: {'isReg": bool, 'isDelet": bool, 'tgtStr': str}}
+    :param 清空旧配置: bool, 是否完全清空现存的配置项
+    :return: int 更新的配置数量
+    """
+    global _网络资源字典
+    if 清空旧配置:
+        _网络资源字典 = {}
+
+    更新配置数量: int = 0
+    if isinstance(字典, dict) and 字典:
+        for 键, 配置 in 字典.items():
+            键 = str(键).strip()
+            if 键 and isinstance(配置, dict):
+                isReg: bool = 配置['isReg'] if hasattr(配置, 'isReg') else False
+                isDelet: bool = 配置['isDelet'] if hasattr(配置, 'isDelet') else False
+                tgtStr: str = str(配置['tgtStr']) if hasattr(配置, 'tgtStr') and 配置['tgtStr'] is not None else ''
+
+                _网络资源字典[键] = {'isReg': isReg, 'isDelet': isDelet, 'tgtStr': tgtStr}
+                更新配置数量 += 1
+
+    return 更新配置数量
+
+
+# 指定 js/css 资源的本地地址
+_本地资源字典: dict = {r'src="https.*/jquery.*.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/jQuery/jquery-2.0.0.js"'},
+                                 r'src="https.*/leaflet.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet/leaflet.js"'},
+                                 r'src="https.*/bootstrap.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"'},
+                                 r'src="https.*/leaflet.awesome-markers.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"'},
+                                 r'src="https.*/leaflet.markercluster.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"'},
+                                 r'src="https.*/leaflet-dvf.markers.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"'},
+                                 r'src="https.*/dist/js/bootstrap.bundle.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"'},
+                                 r'src="https.*/dist/leaflet-measure.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"'},
+                                 r'src="https.*/leaflet.textpath.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"'},
+                                 r'src="https.*/templates/leaflet_heat.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet/leaflet_heat.min.js"'},
+                                 r'src="https.*/dist/leaflet-ant-path.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"'},
+                                 r'href="https.*/dist/leaflet.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet/leaflet.css"'},
+                                 r'href="https.*/bootstrap.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"'},
+                                 r'href="https.*/bootstrap-theme.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"'},
+                                 r'href="https.*/css/font-awesome.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"'},
+                                 r'href="https.*/leaflet.awesome-markers.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"'},
+                                 r'href="https:.*/leaflet.awesome.rotate.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"'},
+                                 r'href="https.*/MarkerCluster.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"'},
+                                 r'href="https.*/MarkerCluster.Default.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"'},
+                                 r'href="https.*/fontawesome.*/css/all.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"'},
+                                 r'href="https.*/dist/leaflet-measure.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'}}
+
+
+def _更新本地资源字典(字典: dict, 清空旧配置: bool = False) -> int:
+    """
+    使用指定的字典更新 _本地资源字典 中的配置,返回更新的配置项数
+    :param 字典: 以字典方式定义的配置参数{资源项目/名称: {'isReg": bool, 'isDelet": bool, 'tgtStr': str}}
+    :param 清空旧配置: bool, 是否完全清空现存的配置项
+    :return: int 更新的配置数量
+    """
+    global _本地资源字典
+    if 清空旧配置:
+        _本地资源字典 = {}
+
+    更新配置数量: int = 0
+    if isinstance(字典, dict) and 字典:
+        for 键, 配置 in 字典.items():
+            键 = str(键).strip()
+            if 键 and isinstance(配置, dict):
+                isReg: bool = 配置['isReg'] if hasattr(配置, 'isReg') else False
+                isDelet: bool = 配置['isDelet'] if hasattr(配置, 'isDelet') else False
+                tgtStr: str = str(配置['tgtStr']) if hasattr(配置, 'tgtStr') and 配置['tgtStr'] is not None else ''
+
+                _本地资源字典[键] = {'isReg': isReg, 'isDelet': isDelet, 'tgtStr': tgtStr}
+                更新配置数量 += 1
+
+    return 更新配置数量
 
 
 @_unique
@@ -2284,7 +2364,8 @@ class 地图类:
 
         self.__基准瓦片: list[_folium.TileLayer] = []
 
-        self.__资源置换器: callable = None
+        self.__本地资源优化器: callable = None
+        self.__网络资源优化器: callable = None
 
         self.底图坐标系: GPS坐标系类型 = 基准坐标系
         self.__GPS坐标系推理基准: GPS坐标系类型 = self.底图坐标系
@@ -2331,56 +2412,16 @@ class 地图类:
 
     # region 访问器
     @property
-    def 支持测距(self) -> '地图类':
-        self.__测距 = True
-        return self
-
-    @property
-    def 禁止测距(self) -> '地图类':
-        self.__测距 = False
-        return self
-
-    @property
     def 测距状态(self) -> bool:
         return self.__测距
-
-    @property
-    def 支持鼠标绘图(self) -> '地图类':
-        self.__鼠标绘图 = True
-        return self
-
-    @property
-    def 禁止鼠标绘图(self) -> '地图类':
-        self.__鼠标绘图 = False
-        return self
 
     @property
     def 鼠标绘图状态(self) -> bool:
         return self.__鼠标绘图
 
     @property
-    def 支持点击标记(self) -> '地图类':
-        self.__点击标记 = True
-        return self
-
-    @property
-    def 禁止点击标记(self) -> '地图类':
-        self.__点击标记 = False
-        return self
-
-    @property
     def 点击标记状态(self) -> bool:
         return self.__点击标记
-
-    @property
-    def 支持坐标拾取(self) -> '地图类':
-        self.__位置拾取 = True
-        return self
-
-    @property
-    def 禁止坐标拾取(self) -> '地图类':
-        self.__位置拾取 = False
-        return self
 
     @property
     def 坐标拾取状态(self) -> bool:
@@ -2402,61 +2443,26 @@ class 地图类:
         self.__中心点 = 坐标
 
     @property
-    def 允许资源置换(self) -> '地图类':
-        资源置换表: dict[str, str] = {r'src="https.*/jquery.*.min.js"': r'src="./src/jQuery/jquery-2.0.0.js"',
-                                 r'src="https.*/leaflet.js"': r'src="./src/leaflet/leaflet.js"',
-                                 r'src="https.*/bootstrap.min.js"': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"',
-                                 r'src="https.*/leaflet.awesome-markers.js"': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"',
-                                 r'src="https.*/leaflet.markercluster.js"': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"',
-                                 r'src="https.*/leaflet-dvf.markers.min.js"': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"',
-                                 r'src="https.*/dist/js/bootstrap.bundle.min.js"': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"',
-                                 r'src="https.*/dist/leaflet-measure.min.js"': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"',
-                                 r'src="https.*/leaflet.textpath.min.js"': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"',
-                                 r'src="https.*/templates/leaflet_heat.min.js"': r'src="./src/leaflet/leaflet_heat.min.js"',
-                                 r'src="https.*/dist/leaflet-ant-path.min.js"': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"',
-                                 r'href="https.*/dist/leaflet.css"': r'href="./src/leaflet/leaflet.css"',
-                                 r'href="https.*/bootstrap.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"',
-                                 r'href="https.*/bootstrap-theme.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"',
-                                 r'href="https.*/css/font-awesome.min.css"': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"',
-                                 r'href="https.*/leaflet.awesome-markers.css"': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"',
-                                 r'href="https:.*/leaflet.awesome.rotate.min.css"': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"',
-                                 r'href="https.*/MarkerCluster.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"',
-                                 r'href="https.*/MarkerCluster.Default.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"',
-                                 r'href="https.*/fontawesome.*/css/all.min.css"': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"',
-                                 r'href="https.*/dist/leaflet-measure.min.css"': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'}
-
-        if not 资源置换表:
-            self.__资源置换器 = None
-            return self
-
-        def 资源置换(html文档: str):
-            if not _os.path.isfile(html文档) or not _os.path.exists(html文档):
-                return None
-
-            try:
-                with open(html文档, "r", encoding="utf-8") as 原文档, open("%s.bak" % html文档, "w",
-                                                                      encoding="utf-8") as 目标文档:
-                    for 行数据 in 原文档:
-                        for 原内容, 目标内容 in 资源置换表.items():
-                            行数据 = _re.sub(原内容, 目标内容, 行数据)
-                        目标文档.write(行数据)
-                _os.remove(html文档)
-                _os.rename("%s.bak" % html文档, html文档)
-            except Exception as exp:
-                raise exp
-            return None
-
-        self.__资源置换器 = 资源置换
-        return self
-
-    @property
-    def 禁止资源置换(self) -> '地图类':
-        self.__资源置换器 = None
-        return self
-
-    @property
     def 图层数量(self) -> int:
         return len(self.__图层表)
+
+    @property
+    def 网络资源字典(self) -> dict:
+        global _网络资源字典
+        return _deepcopy(_网络资源字典)
+
+    @网络资源字典.setter
+    def 网络资源字典(self, 字典: dict):
+        _更新网络资源字典(字典=字典, 清空旧配置=True)
+
+    @property
+    def 本地资源字典(self) -> dict:
+        global _本地资源字典
+        return _本地资源字典
+
+    @本地资源字典.setter
+    def 本地资源字典(self, 字典: dict):
+        _更新本地资源字典(字典=字典, 清空旧配置=True)
 
     # endregion
 
@@ -3028,6 +3034,232 @@ class 地图类:
         self.__网页标题.append(这个标题)
         return self
 
+    def 允许资源置换(self) -> '地图类':
+        """
+        在生成的html文档中，查检所引用的js/css资源，使用路径 ./src下的同名js/css资源对src/href引用进行转换，使js/css资源转换为本地引用，提升html加载效率
+        """
+        资源置换表: dict[str, str] = {r'src="https.*/jquery.*.min.js"': r'src="./src/jQuery/jquery-2.0.0.js"',
+                                 r'src="https.*/leaflet.js"': r'src="./src/leaflet/leaflet.js"',
+                                 r'src="https.*/bootstrap.min.js"': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"',
+                                 r'src="https.*/leaflet.awesome-markers.js"': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"',
+                                 r'src="https.*/leaflet.markercluster.js"': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"',
+                                 r'src="https.*/leaflet-dvf.markers.min.js"': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"',
+                                 r'src="https.*/dist/js/bootstrap.bundle.min.js"': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"',
+                                 r'src="https.*/dist/leaflet-measure.min.js"': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"',
+                                 r'src="https.*/leaflet.textpath.min.js"': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"',
+                                 r'src="https.*/templates/leaflet_heat.min.js"': r'src="./src/leaflet/leaflet_heat.min.js"',
+                                 r'src="https.*/dist/leaflet-ant-path.min.js"': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"',
+                                 r'href="https.*/dist/leaflet.css"': r'href="./src/leaflet/leaflet.css"',
+                                 r'href="https.*/bootstrap.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"',
+                                 r'href="https.*/bootstrap-theme.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"',
+                                 r'href="https.*/css/font-awesome.min.css"': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"',
+                                 r'href="https.*/leaflet.awesome-markers.css"': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"',
+                                 r'href="https:.*/leaflet.awesome.rotate.min.css"': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"',
+                                 r'href="https.*/MarkerCluster.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"',
+                                 r'href="https.*/MarkerCluster.Default.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"',
+                                 r'href="https.*/fontawesome.*/css/all.min.css"': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"',
+                                 r'href="https.*/dist/leaflet-measure.min.css"': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'}
+
+        if not 资源置换表:
+            self.__本地资源优化器 = None
+            return self
+
+        def 资源置换(html文档: str):
+            if not _os.path.isfile(html文档) or not _os.path.exists(html文档):
+                return None
+
+            try:
+                with open(html文档, "r", encoding="utf-8") as 原文档, open("%s.bak" % html文档, "w",
+                                                                      encoding="utf-8") as 目标文档:
+                    for 行数据 in 原文档:
+                        for 原内容, 目标内容 in 资源置换表.items():
+                            行数据 = _re.sub(原内容, 目标内容, 行数据)
+                        目标文档.write(行数据)
+                _os.remove(html文档)
+                _os.rename("%s.bak" % html文档, html文档)
+            except Exception as exp:
+                raise exp
+            return None
+
+        self.__本地资源优化器 = 资源置换
+        return self
+
+    def 支持测距(self) -> '地图类':
+        """
+        在folium对象中增加测距插件
+        """
+        self.__测距 = True
+        return self
+
+    def 禁止测距(self) -> '地图类':
+        """
+        在folium对象中不增加测距插件
+        """
+        self.__测距 = False
+        return self
+
+    def 支持鼠标绘图(self) -> '地图类':
+        """
+        在folium对象中增加鼠标绘图支持
+        """
+        self.__鼠标绘图 = True
+        return self
+
+    def 禁止鼠标绘图(self) -> '地图类':
+        """
+        在folium对象中不增加鼠标绘图支持
+        """
+        self.__鼠标绘图 = False
+        return self
+
+    def 支持点击标记(self) -> '地图类':
+        """
+        在folium对象中增加鼠标点南增加marker的支持
+        """
+        self.__点击标记 = True
+        return self
+
+    def 禁止点击标记(self) -> '地图类':
+        """
+        在folium对象中不增加鼠标点南增加marker的支持
+        """
+        self.__点击标记 = False
+        return self
+
+    def 支持坐标拾取(self) -> '地图类':
+        """
+        在folium对象中增加鼠标拾取GPS坐标的能力
+        """
+        self.__位置拾取 = True
+        return self
+
+    def 禁止坐标拾取(self) -> '地图类':
+        """
+        在folium对象中不增加鼠标拾取GPS坐标的能力
+        """
+        self.__位置拾取 = False
+        return self
+
+    @classmethod
+    def 网络资源字典调整(cls, 字典: dict) -> int:
+        """
+        使用指定的字典配置来调整 _网络资源字典 中的对应的配置项目,如果 _网络资源字典 中不存在的项目,则增加之
+        :param 字典: 以字典方式定义的配置参数{资源项目/名称: {'isReg": bool, 'isDelet": bool, 'tgtStr': str}}
+        :return: int 更新的配置数量
+        """
+        return _更新网络资源字典(字典=字典, 清空旧配置=False)
+
+    @classmethod
+    def 本地资源字典调整(cls, 字典: dict) -> int:
+        """
+        使用指定的字典配置来调整 _本地资源字典 中的对应的配置项目,如果 _网络资源字典 中不存在的项目,则增加之
+        :param 字典: 以字典方式定义的配置参数{资源项目/名称: {'isReg": bool, 'isDelet": bool, 'tgtStr': str}}
+        :return: int 更新的配置数量
+        """
+        return _更新本地资源字典(字典=字典, 清空旧配置=False)
+
+    def 优化网络资源(self) -> '地图类':
+        """
+        使用 _网络资源字典 中定义优化配置,对html文档中的 js/css 资源引用进行优化
+        """
+        def 网络资源优化(html文档: str):
+            if not _os.path.isfile(html文档):
+                return None
+
+            global _网络资源字典
+            if not (isinstance(_网络资源字典, dict) and _网络资源字典):
+                return None
+
+            try:
+                with open(html文档, "r", encoding="utf-8") as 原文档, open("%s.bak" % html文档, "w",
+                                                                      encoding="utf-8") as 目标文档:
+                    for 行数据 in 原文档:
+                        if '<script src=' in 行数据 or ('<link' in 行数据 and 'href=' in 行数据):
+                            # 如果这行是一个script标签,或者是一个 link标签,则判断是否需要做处理, 并在必要的时候进行处理
+                            for 键, 配置 in _网络资源字典.items():
+                                # 对每一个配置项,判断是否命中和处理
+                                if 键 and isinstance(配置, dict):
+                                    # 提取配置项和配置参数
+                                    isReg: bool = 配置['isReg'] if 配置['isReg'] else False
+                                    isDelet: bool = 配置['isDelet'] if 配置['isDelet'] else False
+                                    tgtStr: str = str(配置['tgtStr']) if 配置['tgtStr'] else ''
+
+                                    # 判断是否命中/是否需要处理
+                                    需要处理: bool
+                                    if isReg:
+                                        需要处理 = _re.search(键, 行数据) is not None
+                                    else:
+                                        需要处理 = 键 in 行数据
+
+                                    # 如果需要处理,则处理之
+                                    if 需要处理:
+                                        if isDelet:
+                                            行数据 = ''
+                                        elif isReg:
+                                            行数据 = _re.sub(键, tgtStr, 行数据)
+                                        else:
+                                            行数据 = 行数据.replace(键, tgtStr)
+                        目标文档.write(行数据)
+                _os.remove(html文档)
+                _os.rename("%s.bak" % html文档, html文档)
+            except Exception as exp:
+                raise exp
+            return None
+
+        self.__网络资源优化器 = 网络资源优化
+        return self
+
+    def 网络资源本地化(self) -> '地图类':
+        """
+        使用 _本地资源字典 中定义优化配置,对html文档中的 js/css 资源引用进行优化
+        """
+        def 网络资源重定向(html文档: str):
+            if not _os.path.isfile(html文档):
+                return None
+
+            global _本地资源字典
+            if not (isinstance(_本地资源字典, dict) and _本地资源字典):
+                return None
+
+            try:
+                with open(html文档, "r", encoding="utf-8") as 原文档, open("%s.bak" % html文档, "w",
+                                                                      encoding="utf-8") as 目标文档:
+                    for 行数据 in 原文档:
+                        if '<script src=' in 行数据 or ('<link' in 行数据 and 'href=' in 行数据):
+                            # 如果这行是一个script标签,或者是一个 link标签,则判断是否需要做处理, 并在必要的时候进行处理
+                            for 键, 配置 in _本地资源字典.items():
+                                # 对每一个配置项,判断是否命中和处理
+                                if 键 and isinstance(配置, dict):
+                                    # 提取配置项和配置参数
+                                    isReg: bool = 配置['isReg'] if 配置['isReg'] else False
+                                    isDelet: bool = 配置['isDelet'] if 配置['isDelet'] else False
+                                    tgtStr: str = str(配置['tgtStr']) if 配置['tgtStr'] else ''
+
+                                    # 判断是否命中/是否需要处理
+                                    需要处理: bool
+                                    if isReg:
+                                        需要处理 = _re.search(键, 行数据) is not None
+                                    else:
+                                        需要处理 = 键 in 行数据
+
+                                    # 如果需要处理,则处理之
+                                    if 需要处理:
+                                        if isDelet:
+                                            行数据 = ''
+                                        elif isReg:
+                                            行数据 = _re.sub(键, tgtStr, 行数据)
+                                        else:
+                                            行数据 = 行数据.replace(键, tgtStr)
+                        目标文档.write(行数据)
+                _os.remove(html文档)
+                _os.rename("%s.bak" % html文档, html文档)
+            except Exception as exp:
+                raise exp
+            return None
+
+        self.__本地资源优化器 = 网络资源重定向
+        return self
+
     def 生成Map对象(self,
                 画板: _打印模板 = None) -> _folium.Map:
         """
@@ -3159,7 +3391,6 @@ class 地图类:
                 self.地图文档 = 地图文档
                 self.__画板 = 画板 if 画板 else _打印模板()
 
-            # region 访问器
             def 打开(self) -> None:
                 self.__画板.执行位置(self.打开)
 
@@ -3170,8 +3401,6 @@ class 地图类:
                         self.__画板.提示错误(f'无法打开地图文档,文档[{self.地图文档}]不存在')
 
                 return None
-
-            # endregion
 
             def __str__(self) -> str:
                 return str(self.地图文档)
@@ -3212,11 +3441,18 @@ class 地图类:
             生成结果.地图文档 = ''
         else:
             # html资源置换
-            if self.__资源置换器:
+            if self.__本地资源优化器 and callable(self.__本地资源优化器):
                 try:
-                    self.__资源置换器(生成结果.地图文档)
+                    self.__本地资源优化器(生成结果.地图文档)
                 except Exception as exp1:
                     画板.提示错误('资源替换遇到异常:', exp1)
+                    生成结果.地图文档 = ''
+            # 网络资源优化
+            if self.__网络资源优化器 and callable(self.__网络资源优化器):
+                try:
+                    self.__网络资源优化器(生成结果.地图文档)
+                except Exception as exp1:
+                    画板.提示错误('优化网络资源(js/css)遇到异常:', exp1)
                     生成结果.地图文档 = ''
         # endregion
 
@@ -3240,25 +3476,16 @@ class 地图类:
         画板.添加一行('底图坐标系:', 'folium.Map 对象的基准GPS坐标系')
         画板.添加一行('添加瓦片:',
                 '一个工具箱成员,用于向地图添加不同的地图瓦片, 你可以通过 地图类.添加瓦片.__doc__ 查阅更多说明')
-        画板.添加一行('支持测距:', '在html文档中打开测距插件(plugins.MeasureControl)')
-        画板.添加一行('禁止测距:', '在html文档中关闭测距插件(plugins.MeasureControl)')
         画板.添加一行('测距状态:', '显示当前是否允许向html地图中添加测距插件')
-        画板.添加一行('支持鼠标绘图:', '在html文档中打开鼠标绘图插件(plugins.Draw)')
-        画板.添加一行('禁止鼠标绘图:', '在html文档中关闭鼠标绘图插件(plugins.Draw)')
         画板.添加一行('鼠标绘图状态:', '显示当前是否允许向html地图中添加鼠标绘图插件')
-        画板.添加一行('支持点击标记:', '在html文档中打开点击标记插件(plugins.ClickForMarker)')
-        画板.添加一行('禁止点击标记:', '在html文档中关闭点击标记插件(plugins.ClickForMarker)')
         画板.添加一行('点击标记状态:', '显示当前是否允许向html地图中添加点击标记插件')
-        画板.添加一行('支持坐标拾取:', '在html文档中打开坐标拾取插件(plugins.LatLngPopup)')
-        画板.添加一行('禁止坐标拾取:', '在html文档中关闭坐标拾取插件(plugins.LatLngPopup)')
         画板.添加一行('坐标拾取状态:', '显示当前是否允许向html地图中添加坐标拾取插件')
         画板.添加一行('中心点:',
                 '读取或者设置 folium.Map 对像的中心点,如果未指定中心点,则根据已经设置的基地坐标计算数据中心点')
-        画板.添加一行('允许资源置换:',
-                '在html文档中,将 js/css 引用置换为html文档所在路下 src 子路径下的对应资源引用, 提升html文档的打开速度')
-        画板.添加一行('禁止资源置换:', '不对html文档内的 js/css 引用做任何处理')
         画板.添加一行('图层数量:',
                 '当前 地图类 对象中的 图层类 和 热力层类 对象的数量, 不一定为html地图中显示的图层数量')
+        画板.添加一行('网络资源字典', '设置/返回 _网络资源字典 的拷贝, 一个 dict 对象')
+        画板.添加一行('本地资源字典', '设置/返回 _本地资源字典 的拷贝, 一个 dict 对象')
 
         画板.添加分隔行('-', None if callable(打印方法) else _黄字)
         if callable(打印方法):
@@ -3274,6 +3501,18 @@ class 地图类:
         画板.添加一行('添加参考纬线:', '地图类对象.添加参考纬线.__doc__ 查阅详情')
         画板.添加一行('添加参考经纬线:', '地图类对象.添加参考经纬线.__doc__ 查阅详情')
         画板.添加一行('添加网页标题:', '地图类对象.添加网页标题.__doc__ 查阅详情')
+        画板.添加一行('支持测距:', '地图类对象.支持测距.__doc__ 查阅详情')
+        画板.添加一行('禁止测距:', '地图类对象.禁止测距.__doc__ 查阅详情')
+        画板.添加一行('支持鼠标绘图:', '地图类对象.支持鼠标绘图.__doc__ 查阅详情')
+        画板.添加一行('禁止鼠标绘图:', '地图类对象.禁止鼠标绘图.__doc__ 查阅详情')
+        画板.添加一行('支持点击标记:', '地图类对象.支持点击标记.__doc__ 查阅详情')
+        画板.添加一行('禁止点击标记:', '地图类对象.禁止点击标记.__doc__ 查阅详情')
+        画板.添加一行('支持坐标拾取:', '地图类对象.支持坐标拾取.__doc__ 查阅详情')
+        画板.添加一行('禁止坐标拾取:', '地图类对象.禁止坐标拾取.__doc__ 查阅详情')
+        画板.添加一行('网络资源字典调整', '地图类对象.网络资源字典调整.__doc__ 查阅详情')
+        画板.添加一行('本地资源字典调整', '地图类对象.网络资源字典调整.__doc__ 查阅详情')
+        画板.添加一行('优化网络资源', '地图类对象.优化网络资源.__doc__ 查阅详情')
+        画板.添加一行('网络资源本地化', '地图类对象.网络资源本地化.__doc__ 查阅详情')
         画板.添加一行('生成Map对象:', '地图类对象.生成Map对象.__doc__ 查阅详情')
         画板.添加一行('展示地图:', '地图类对象.展示地图.__doc__ 查阅详情')
         画板.添加一行('保存html:', '地图类对象.保存html.__doc__ 查阅详情')
