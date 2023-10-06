@@ -10,57 +10,56 @@ from copy import copy as _copy
 from datetime import datetime as _datetime
 import re as _re
 
+模块名 = 'folium'
 try:
     import folium as _folium
     from folium import plugins as _plugins
-except ImportError as imErr:
-    _folium = None
-    _plugins = None
-
-    print('尝试导入 folium 模块时遇到异常:', imErr)
+except ImportError as impErr:
+    print(f"尝试导入 {模块名} 依赖时检测到异常：{impErr}")
+    print(f"尝试安装 {模块名} 模块：")
     try:
-        _os.system('pip install folium')
-        print('导入 folium 成功')
-    except Exception as exp:
-        print('尝试安装 folium 时遇到异常:', exp)
-        raise exp
+        _os.system(f"pip install {模块名}")
+    except OSError as osErr:
+        print(f"尝试安装模块 {模块名} 时检测到异常：{osErr}")
+        raise osErr
     else:
         try:
             import folium as _folium
             from folium import plugins as _plugins
-        except Exception as exp1:
-            print('再次尝试导入 folium 时遇到异常:', exp1)
-            raise exp1
+        except ImportError as impErr:
+            print(f"再次尝试导入 {模块名} 依赖时检测到异常：{impErr}")
+            raise impErr
+
+模块名 = 'DebugInfo'
+try:
+    from DebugInfo.DebugInfo import 打印模板 as _打印模板
+    from DebugInfo.DebugInfo import 黄字 as _黄字
+    from DebugInfo.DebugInfo import 青字 as _青字
+except ImportError as impErr:
+    print(f"尝试导入 {模块名} 依赖时检测到异常：{impErr}")
+    print(f"尝试安装 {模块名} 模块：")
+    try:
+        _os.system(f"pip install {模块名}")
+    except OSError as osErr:
+        print(f"尝试安装模块 {模块名} 时检测到异常：{osErr}")
+        raise osErr
+    else:
+        try:
+            from DebugInfo.DebugInfo import 打印模板 as _打印模板
+            from DebugInfo.DebugInfo import 黄字 as _黄字
+            from DebugInfo.DebugInfo import 青字 as _青字
+        except ImportError as impErr:
+            print(f"再次尝试导入 {模块名} 依赖时检测到异常：{impErr}")
+            raise impErr
 
 try:
     from src.GpsAndMap.GpsModule import *
 except ImportError:
     try:
         from GpsAndMap.GpsModule import *
-    except ImportError as imErr:
-        print('尝试导入 GpsModule 模块遇到异常:', imErr)
-        raise imErr
-
-try:
-    from DebugInfo.DebugInfo import 打印模板 as _打印模板
-    from DebugInfo.DebugInfo import 黄字 as _黄字
-    from DebugInfo.DebugInfo import 青字 as _青字
-except ImportError as imErr:
-    print('尝试导入 DebugInfo 模块时遇到异常:', imErr)
-    try:
-        _os.system('pip install DebugInfo')
-        print('导入 DebugInfo 成功')
-    except Exception as exp:
-        print('尝试安装 DebugInfo 时遇到异常:', exp)
-        raise exp
-    else:
-        try:
-            from DebugInfo.DebugInfo import 打印模板 as _打印模板
-            from DebugInfo.DebugInfo import 黄字 as _黄字
-            from DebugInfo.DebugInfo import 青字 as _青字
-        except Exception as exp1:
-            print('再次尝试导入 DebugInfo 时遇到异常:', exp1)
-            raise exp1
+    except ImportError as impErr:
+        print('尝试导入 GpsModule 模块遇到异常:', impErr)
+        raise impErr
 
 # endregion
 
@@ -3032,56 +3031,6 @@ class 地图类:
             这个标题.文本属性字典 = 文本属性字典
 
         self.__网页标题.append(这个标题)
-        return self
-
-    def 允许资源置换(self) -> '地图类':
-        """
-        在生成的html文档中，查检所引用的js/css资源，使用路径 ./src下的同名js/css资源对src/href引用进行转换，使js/css资源转换为本地引用，提升html加载效率
-        """
-        资源置换表: dict[str, str] = {r'src="https.*/jquery.*.min.js"': r'src="./src/jQuery/jquery-2.0.0.js"',
-                                 r'src="https.*/leaflet.js"': r'src="./src/leaflet/leaflet.js"',
-                                 r'src="https.*/bootstrap.min.js"': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"',
-                                 r'src="https.*/leaflet.awesome-markers.js"': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"',
-                                 r'src="https.*/leaflet.markercluster.js"': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"',
-                                 r'src="https.*/leaflet-dvf.markers.min.js"': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"',
-                                 r'src="https.*/dist/js/bootstrap.bundle.min.js"': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"',
-                                 r'src="https.*/dist/leaflet-measure.min.js"': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"',
-                                 r'src="https.*/leaflet.textpath.min.js"': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"',
-                                 r'src="https.*/templates/leaflet_heat.min.js"': r'src="./src/leaflet/leaflet_heat.min.js"',
-                                 r'src="https.*/dist/leaflet-ant-path.min.js"': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"',
-                                 r'href="https.*/dist/leaflet.css"': r'href="./src/leaflet/leaflet.css"',
-                                 r'href="https.*/bootstrap.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"',
-                                 r'href="https.*/bootstrap-theme.min.css"': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"',
-                                 r'href="https.*/css/font-awesome.min.css"': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"',
-                                 r'href="https.*/leaflet.awesome-markers.css"': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"',
-                                 r'href="https:.*/leaflet.awesome.rotate.min.css"': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"',
-                                 r'href="https.*/MarkerCluster.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"',
-                                 r'href="https.*/MarkerCluster.Default.css"': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"',
-                                 r'href="https.*/fontawesome.*/css/all.min.css"': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"',
-                                 r'href="https.*/dist/leaflet-measure.min.css"': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'}
-
-        if not 资源置换表:
-            self.__本地资源优化器 = None
-            return self
-
-        def 资源置换(html文档: str):
-            if not _os.path.isfile(html文档) or not _os.path.exists(html文档):
-                return None
-
-            try:
-                with open(html文档, "r", encoding="utf-8") as 原文档, open("%s.bak" % html文档, "w",
-                                                                      encoding="utf-8") as 目标文档:
-                    for 行数据 in 原文档:
-                        for 原内容, 目标内容 in 资源置换表.items():
-                            行数据 = _re.sub(原内容, 目标内容, 行数据)
-                        目标文档.write(行数据)
-                _os.remove(html文档)
-                _os.rename("%s.bak" % html文档, html文档)
-            except Exception as exp:
-                raise exp
-            return None
-
-        self.__本地资源优化器 = 资源置换
         return self
 
     def 支持测距(self) -> '地图类':

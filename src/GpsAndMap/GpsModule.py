@@ -16,26 +16,27 @@ from math import atan2 as _atan2
 from math import log as _log
 from math import exp as _exp
 
+模块名 = 'DebugInfo'
 try:
     from DebugInfo.DebugInfo import 打印模板 as _打印模板
     from DebugInfo.DebugInfo import 黄字 as _黄字
     from DebugInfo.DebugInfo import 青字 as _青字
-except ImportError as imErr:
-    print('尝试导入 DebugInfo 模块时遇到异常:', imErr)
+except ImportError as impErr:
+    print(f"尝试导入 {模块名} 依赖时检测到异常：{impErr}")
+    print(f"尝试安装 {模块名} 模块：")
     try:
-        _os.system('pip install DebugInfo')
-        print('导入 DebugInfo 成功')
-    except Exception as exp:
-        print('尝试安装 DebugInfo 时遇到异常:', exp)
-        raise exp
+        _os.system(f"pip install {模块名}")
+    except OSError as osErr:
+        print(f"尝试安装模块 {模块名} 时检测到异常：{osErr}")
+        raise osErr
     else:
         try:
             from DebugInfo.DebugInfo import 打印模板 as _打印模板
             from DebugInfo.DebugInfo import 黄字 as _黄字
             from DebugInfo.DebugInfo import 青字 as _青字
-        except Exception as exp1:
-            print('再次尝试导入 DebugInfo 时遇到异常:', exp1)
-            raise exp1
+        except ImportError as impErr:
+            print(f"再次尝试导入 {模块名} 依赖时检测到异常：{impErr}")
+            raise impErr
 
 # endregion
 
