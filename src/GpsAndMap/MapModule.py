@@ -1,6 +1,7 @@
 # -*- coding:UTF-8 -*-
 
 # region 导入依赖项
+import math
 import os as _os
 import webbrowser as _webbrowser
 from enum import Enum as _Enum
@@ -69,7 +70,7 @@ _网络资源字典: dict = {r'cdn.jsdelivr.net': {'isReg': False, 'isDelet': Fa
                  r'netdna.bootstrapcdn.com': {'isReg': False, 'isDelet': True, 'tgtStr': r'fastly.jsdelivr.net'}}
 
 
-def _更新网络资源字典(字典: dict, 清空旧配置: bool = False) -> int:
+def _更新网络资源字典(字典: dict[str, dict], 清空旧配置: bool = False) -> int:
     """
     使用指定的字典更新 _网络资源字典 中的配置,返回更新的配置项数
     :param 字典: 以字典方式定义的配置参数{资源项目/名称: {'isReg": bool, 'isDelet": bool, 'tgtStr': str}}
@@ -97,29 +98,43 @@ def _更新网络资源字典(字典: dict, 清空旧配置: bool = False) -> in
 
 # 指定 js/css 资源的本地地址
 _本地资源字典: dict = {r'src="https.*/jquery.*.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/jQuery/jquery-2.0.0.js"'},
-                                 r'src="https.*/leaflet.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet/leaflet.js"'},
-                                 r'src="https.*/bootstrap.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"'},
-                                 r'src="https.*/leaflet.awesome-markers.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"'},
-                                 r'src="https.*/leaflet.markercluster.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"'},
-                                 r'src="https.*/leaflet-dvf.markers.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"'},
-                                 r'src="https.*/dist/js/bootstrap.bundle.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"'},
-                                 r'src="https.*/dist/leaflet-measure.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"'},
-                                 r'src="https.*/leaflet.textpath.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"'},
-                                 r'src="https.*/templates/leaflet_heat.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet/leaflet_heat.min.js"'},
-                                 r'src="https.*/dist/leaflet-ant-path.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"'},
-                                 r'href="https.*/dist/leaflet.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet/leaflet.css"'},
-                                 r'href="https.*/bootstrap.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"'},
-                                 r'href="https.*/bootstrap-theme.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"'},
-                                 r'href="https.*/css/font-awesome.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"'},
-                                 r'href="https.*/leaflet.awesome-markers.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"'},
-                                 r'href="https:.*/leaflet.awesome.rotate.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"'},
-                                 r'href="https.*/MarkerCluster.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"'},
-                                 r'href="https.*/MarkerCluster.Default.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"'},
-                                 r'href="https.*/fontawesome.*/css/all.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"'},
-                                 r'href="https.*/dist/leaflet-measure.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'}}
+                 r'src="https.*/leaflet.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet/leaflet.js"'},
+                 r'src="https.*/bootstrap.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/bootstrap-3.3.7/js/bootstrap.min.js"'},
+                 r'src="https.*/leaflet.awesome-markers.js"': {'isReg': True, 'isDelet': False,
+                                                               'tgtStr': r'src="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.js"'},
+                 r'src="https.*/leaflet.markercluster.js"': {'isReg': True, 'isDelet': False,
+                                                             'tgtStr': r'src="./src/leaflet.markercluster/dist/leaflet.markercluster.js"'},
+                 r'src="https.*/leaflet-dvf.markers.min.js"': {'isReg': True, 'isDelet': False,
+                                                               'tgtStr': r'src="./src/leaflet-dvf/leaflet-dvf.markers.min.js"'},
+                 r'src="https.*/dist/js/bootstrap.bundle.min.js"': {'isReg': True, 'isDelet': False,
+                                                                    'tgtStr': r'src="./src/bootstrap-5.2.2/dist/js/bootstrap.bundle.min.js"'},
+                 r'src="https.*/dist/leaflet-measure.min.js"': {'isReg': True, 'isDelet': False,
+                                                                'tgtStr': r'src="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.js"'},
+                 r'src="https.*/leaflet.textpath.min.js"': {'isReg': True, 'isDelet': False,
+                                                            'tgtStr': r'src="./src/leaflet-textpath-1.2.3/leaflet.textpath.min.js"'},
+                 r'src="https.*/templates/leaflet_heat.min.js"': {'isReg': True, 'isDelet': False, 'tgtStr': r'src="./src/leaflet/leaflet_heat.min.js"'},
+                 r'src="https.*/dist/leaflet-ant-path.min.js"': {'isReg': True, 'isDelet': False,
+                                                                 'tgtStr': r'src="./src/leaflet-ant-path-1.1.2/dist/leaflet-ant-path.min.js"'},
+                 r'href="https.*/dist/leaflet.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet/leaflet.css"'},
+                 r'href="https.*/bootstrap.min.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/bootstrap-3.3.7/css/bootstrap.min.css"'},
+                 r'href="https.*/bootstrap-theme.min.css"': {'isReg': True, 'isDelet': False,
+                                                             'tgtStr': r'href="./src/bootstrap-3.3.7/css/bootstrap-theme.min.css"'},
+                 r'href="https.*/css/font-awesome.min.css"': {'isReg': True, 'isDelet': False,
+                                                              'tgtStr': r'href="./src/font-awesome-4.7.0/css/font-awesome.min.css"'},
+                 r'href="https.*/leaflet.awesome-markers.css"': {'isReg': True, 'isDelet': False,
+                                                                 'tgtStr': r'href="./src/Leaflet.awesome-markers-2.0.2/dist/leaflet.awesome-markers.css"'},
+                 r'href="https:.*/leaflet.awesome.rotate.min.css"': {'isReg': True, 'isDelet': False,
+                                                                     'tgtStr': r'href="./src/leaflet.awesome.rotate/leaflet.awesome.rotate.css"'},
+                 r'href="https.*/MarkerCluster.css"': {'isReg': True, 'isDelet': False, 'tgtStr': r'href="./src/leaflet.markercluster/dist/MarkerCluster.css"'},
+                 r'href="https.*/MarkerCluster.Default.css"': {'isReg': True, 'isDelet': False,
+                                                               'tgtStr': r'href="./src/leaflet.markercluster/dist/MarkerCluster.Default.css"'},
+                 r'href="https.*/fontawesome.*/css/all.min.css"': {'isReg': True, 'isDelet': False,
+                                                                   'tgtStr': r'href="./src/fontawesome-free-6.2.0/css/all.min.css"'},
+                 r'href="https.*/dist/leaflet-measure.min.css"': {'isReg': True, 'isDelet': False,
+                                                                  'tgtStr': r'href="./src/leaflet-measure-2.1.7/dist/leaflet-measure.min.css"'}}
 
 
-def _更新本地资源字典(字典: dict, 清空旧配置: bool = False) -> int:
+def _更新本地资源字典(字典: dict[str, dict], 清空旧配置: bool = False) -> int:
     """
     使用指定的字典更新 _本地资源字典 中的配置,返回更新的配置项数
     :param 字典: 以字典方式定义的配置参数{资源项目/名称: {'isReg": bool, 'isDelet": bool, 'tgtStr': str}}
@@ -143,6 +158,68 @@ def _更新本地资源字典(字典: dict, 清空旧配置: bool = False) -> in
                 更新配置数量 += 1
 
     return 更新配置数量
+
+
+# 指定一个字典,用于管理参考距离与地图缩放级别的映射, 键:参考距离km; 值: 地图缩放倍率
+_缩放倍率字典: dict[float or int, int] = {0.5: 18,
+                                    1: 17,
+                                    2: 16,
+                                    5: 15,
+                                    10: 14,
+                                    25: 13,
+                                    50: 12,
+                                    90: 11,
+                                    150: 10,
+                                    350: 9,
+                                    700: 8,
+                                    1600: 7,
+                                    3000: 6}
+
+
+def _更新缩放倍率字典(字典: dict[float or int, int], 清空旧配置: bool = False) -> int:
+    """
+    使用指定的字典内容, 更新 _ 缩放倍率表 中对应键值位置的内容, 如果待更新的键不存在,则在对应的位置插入该键:值对
+    :param 字典: 以字典方式定义的配置参数{参考距离(km)上限(>0): 适用的地图缩放倍率(0~18)}
+    :param 清空旧配置: bool, 是否完全清空现存的配置项
+    :return: int 更新的配置数量
+    """
+    global _缩放倍率字典
+    if 清空旧配置:
+        _缩放倍率字典 = {}
+
+    更新配置数量: int = 0
+    if isinstance(字典, dict) and 字典:
+        for 距离, 倍率 in 字典.items():
+            if 距离 > 0 and 0 <= 倍率 <= 18:
+                _缩放倍率字典[距离] = 倍率
+                更新配置数量 += 1
+
+    # 对字典按键值进行排序处理(距离由小到大)
+    升序的距离表: list = sorted(_缩放倍率字典.keys())
+    临时字典: dict[float or int, int] = {}
+    for 距离 in 升序的距离表:
+        临时字典[距离] = _缩放倍率字典[距离]
+
+    # 使用排序后的字典替换原字典
+    _缩放倍率字典 = 临时字典
+
+    return 更新配置数量
+
+
+# 根据参考距离, 计算缩放倍率
+def _缩放倍率(参考距离km: float) -> int:
+    参考距离km = 参考距离km if type(参考距离km) in [float, int] else 0
+    if 参考距离km <= 0:
+        return 18
+
+    global _缩放倍率字典
+    默认倍率: int = 5
+    for 距离, 倍率 in _缩放倍率字典.items():
+        if 参考距离km <= 距离:
+            默认倍率 = 倍率
+            break
+
+    return 默认倍率
 
 
 @_unique
@@ -2439,7 +2516,10 @@ class 地图类:
 
     @中心点.setter
     def 中心点(self, 坐标: GPS坐标类):
-        self.__中心点 = 坐标
+        if isinstance(坐标, GPS坐标类):
+            self.__中心点 = 坐标
+        else:
+            self.__中心点 = GPS坐标类()
 
     @property
     def 图层数量(self) -> int:
@@ -2462,6 +2542,15 @@ class 地图类:
     @本地资源字典.setter
     def 本地资源字典(self, 字典: dict):
         _更新本地资源字典(字典=字典, 清空旧配置=True)
+
+    @property
+    def 缩放倍率字典(self) -> dict:
+        global _缩放倍率字典
+        return _缩放倍率字典
+
+    @缩放倍率字典.setter
+    def 缩放倍率字典(self, 字典: dict[float or int, int]):
+        _更新缩放倍率字典(字典=字典, 清空旧配置=True)
 
     # endregion
 
@@ -3089,6 +3178,49 @@ class 地图类:
         self.__位置拾取 = False
         return self
 
+    def 智能定心(self, *参考点) -> bool:
+        """
+        根据给定的参考点,设置地图的中心点,如果给定的参考点有多个,则根据 _缩放倍率字典 的设置自适应调整地图的缩放倍率
+        :return: 如果检测到至少有一个有效的 GPS坐标类 对象,则返回True
+        """
+        有效坐标点序列: list[GPS坐标类] = []
+        for 点 in 参考点:
+            if isinstance(点, GPS坐标类) and 点.有效:
+                有效坐标点序列.append(点)
+
+        if not 有效坐标点序列:
+            return False
+        if len(有效坐标点序列) == 1:
+            self.__中心点 = 有效坐标点序列[0]
+            return True
+
+        最高纬度wgs84: float = max([点.wgs84坐标[1] for 点 in 有效坐标点序列])
+        最低纬度wgs84: float = min([点.wgs84坐标[1] for 点 in 有效坐标点序列])
+        最大经度wgs84: float = max([点.wgs84坐标[0] for 点 in 有效坐标点序列])
+        最小经度wgs84: float = min([点.wgs84坐标[0] for 点 in 有效坐标点序列])
+
+        距离参考纬度wgs84: float = 0
+        if 最高纬度wgs84 * 最低纬度wgs84 > 0:
+            距离参考纬度wgs84 = 最低纬度wgs84 if math.fabs(最低纬度wgs84) < math.fabs(最高纬度wgs84) else 最高纬度wgs84
+
+        # 以最大轮廓的矩形几何中心点为地图中心点
+        self.__中心点 = GPS坐标类(经度=(最大经度wgs84 + 最小经度wgs84) * 0.5,
+                            纬度=(最高纬度wgs84 + 最低纬度wgs84) * 0.5,
+                            坐标系=GPS坐标系类型.wgs84)
+
+        东西距离西端点: GPS坐标类 = GPS坐标类(经度=最小经度wgs84, 纬度=距离参考纬度wgs84, 坐标系=GPS坐标系类型.wgs84)
+        东西距离东端点: GPS坐标类 = GPS坐标类(经度=最大经度wgs84, 纬度=距离参考纬度wgs84, 坐标系=GPS坐标系类型.wgs84)
+        东西宽度km: float = math.fabs(东西距离西端点.球面距离(东西距离东端点).km)
+
+        南北距离北端点: GPS坐标类 = GPS坐标类(经度=最大经度wgs84, 纬度=最高纬度wgs84, 坐标系=GPS坐标系类型.wgs84)
+        南北距离南端点: GPS坐标类 = GPS坐标类(经度=最大经度wgs84, 纬度=最低纬度wgs84, 坐标系=GPS坐标系类型.wgs84)
+        南北宽度km: float = math.fabs(南北距离南端点.球面距离(南北距离北端点).km)
+
+        参考宽度km: float = max(东西宽度km, 南北宽度km)
+
+        self.初始缩放倍数 = _缩放倍率(参考距离km=参考宽度km)
+        return True
+
     @classmethod
     def 网络资源字典调整(cls, 字典: dict) -> int:
         """
@@ -3107,10 +3239,20 @@ class 地图类:
         """
         return _更新本地资源字典(字典=字典, 清空旧配置=False)
 
+    @classmethod
+    def 缩放倍率字典调整(cls, 字典: dict[float or int, int]) -> int:
+        """
+        使用指定的字典配置来调整 _缩放倍率字典 中的对应的配置项目,如果 _缩放倍率字典 中不存在的项目,则增加之
+        :param 字典: 以字典方式定义的配置参数{参考距离(km)上限(>0): 适用的地图缩放倍率(0~18)}
+        :return: int 更新的配置数量
+        """
+        return _更新缩放倍率字典(字典=字典, 清空旧配置=False)
+
     def 优化网络资源(self) -> '地图类':
         """
         使用 _网络资源字典 中定义优化配置,对html文档中的 js/css 资源引用进行优化
         """
+
         def 网络资源优化(html文档: str):
             if not _os.path.isfile(html文档):
                 return None
@@ -3162,6 +3304,7 @@ class 地图类:
         """
         使用 _本地资源字典 中定义优化配置,对html文档中的 js/css 资源引用进行优化
         """
+
         def 网络资源重定向(html文档: str):
             if not _os.path.isfile(html文档):
                 return None

@@ -326,10 +326,16 @@ class GPS坐标类:
 
     @property
     def 坐标(self) -> tuple[float, float]:
+        """
+        tuple[经度, 纬度]
+        """
         return self.__经度, self.__纬度
 
     @property
     def gcj02坐标(self) -> tuple[float, float]:
+        """
+        tuple[经度, 纬度]
+        """
         if self.__gcj02坐标.有效:
             return self.__gcj02坐标.坐标
         else:
@@ -350,6 +356,9 @@ class GPS坐标类:
 
     @property
     def wgs84坐标(self) -> tuple[float, float]:
+        """
+        tuple[经度, 纬度]
+        """
         if self.__wgs84坐标.有效:
             return self.__wgs84坐标.坐标
         else:
@@ -370,6 +379,9 @@ class GPS坐标类:
 
     @property
     def bd09坐标(self) -> tuple[float, float]:
+        """
+        tuple[经度, 纬度]
+        """
         if self.__bd09坐标.有效:
             return self.__bd09坐标.坐标
         else:
